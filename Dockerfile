@@ -4,6 +4,9 @@ FROM golang:alpine as builder
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
+# Install necessary packages including tzdata for time zone data
+RUN apk update && apk add --no-cache tzdata
+
 # Copy go mod and sum files
 COPY go.mod go.sum ./
 
@@ -18,6 +21,9 @@ RUN go build -o main .
 
 # Start a new stage from scratch
 FROM alpine:latest
+
+# Install tzdata package for time zone data
+RUN apk update && apk add --no-cache tzdata
 
 WORKDIR /root/
 

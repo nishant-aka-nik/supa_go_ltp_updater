@@ -1,3 +1,4 @@
+# use this to install in casa os
 version: '3.8'
 
 services:
@@ -9,3 +10,12 @@ services:
     ports:
       - "1920:8080"
     restart: always
+
+# to build the image
+# docker build -t 9919952021/ltp_updater:latest .
+
+# to login to docker hub
+# docker login
+
+# to push the image
+# docker push 9919952021/ltp_updater:latest
