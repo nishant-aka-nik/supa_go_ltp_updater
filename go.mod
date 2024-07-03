@@ -4,7 +4,7 @@ go 1.21.1
 
 require (
 	github.com/nedpals/supabase-go v0.4.0
-	github.com/robfig/cron v1.2.0
+	github.com/robfig/cron/v3 v3.0.1
 )
 
 require (
