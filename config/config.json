@@ -1,4 +1,8 @@
 {
-    "gsheetUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSh0Zuyvm7ZO9THL8ui3vInpm6llQ1KGQcXaOv5wYQYTrGsXXE_gscXXJ4ytG8IuNigABlc_reW5VeP/pub?gid=1408561328&single=true&output=csv",
-    "runEveryMin": 15
+    "gsheetUrl": "",
+    "runEveryMin": 15,
+    "supabase": {
+        "supabaseUrl": "",
+        "supabaseKey": ""
+    }
 }
