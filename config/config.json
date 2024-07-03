@@ -1,8 +1,0 @@
-{
-    "gsheetUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSh0Zuyvm7ZO9THL8ui3vInpm6llQ1KGQcXaOv5wYQYTrGsXXE_gscXXJ4ytG8IuNigABlc_reW5VeP/pub?gid=1408561328&single=true&output=csv",
-    "supabase": {
-        "supabaseUrl": "https://yutkfbluvhuoshqgbtxe.supabase.co",
-        "supabaseKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl1dGtmYmx1dmh1b3NocWdidHhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTc2OTI5NDEsImV4cCI6MjAzMzI2ODk0MX0.eopTb_b240QiYOvDfsFa0UcXh4c4xHXS9NvU4TdOECc"
-    },
-    "cronSpec":"16 9-17 * * 1-5"
-}
