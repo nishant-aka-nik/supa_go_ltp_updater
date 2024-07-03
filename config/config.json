@@ -1,8 +1,0 @@
-{
-    "gsheetUrl": "",
-    "runEveryMin": 15,
-    "supabase": {
-        "supabaseUrl": "",
-        "supabaseKey": ""
-    }
-}

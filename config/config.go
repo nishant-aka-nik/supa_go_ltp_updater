@@ -9,9 +9,9 @@ import (
 )
 
 type Config struct {
-	GsheetUrl   string   `json:"gsheetUrl"`
-	RunEveryMin int      `json:"runEveryMin"`
-	Supabase    Supabase `json:"supabase"`
+	GsheetUrl string   `json:"gsheetUrl"`
+	Supabase  Supabase `json:"supabase"`
+	CronSpec  string   `json:"cronSpec"`
 }
 
 type Supabase struct {
