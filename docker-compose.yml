@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  app:
+    image: 9919952021/ltp_updater:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "1920:8080"
+    restart: always
