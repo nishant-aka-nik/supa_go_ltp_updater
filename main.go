@@ -41,15 +41,25 @@ func InitCronScheduler() *cron.Cron {
 		log.Fatalf("Failed to load IST location: %v", err)
 	}
 	currentTime := time.Now().In(istLocation)
-	fmt.Printf("Cron job executed at %v\n", currentTime)
+	log.Printf("Initializing cron job at %v\n", currentTime)
 
-	c := cron.New(cron.WithLocation(time.FixedZone("IST", 5*60*60+30*60)))
+	c := cron.New(cron.WithLocation(time.FixedZone("IST", 5*60*60+30*60)),
+		cron.WithParser(
+			cron.NewParser(
+				cron.SecondOptional|cron.Minute|cron.Hour|cron.Dom|cron.Month|cron.Dow)),
+	)
 
-	// Add a cron job that runs every 10 seconds
-	c.AddFunc(config.AppConfig.CronSpec, service.CronLtpUpdater)
+	// Add a cron job that runs every based on cron spec
+	log.Printf("Adding cron job with spec: %s\n", config.AppConfig.CronSpec)
+	cronEntryID, cronErr := c.AddFunc(config.AppConfig.CronSpec, service.CronLtpUpdater)
+	if cronErr != nil {
+		log.Fatalf("Failed to add cron job: %v", cronErr)
+	}
+	log.Printf("Cron job added with ID: %d\n", cronEntryID)
 
 	// Start the cron scheduler
+	log.Println("Starting cron scheduler")
 	c.Start()
-	fmt.Println("Cron scheduler initialized")
+	log.Println("Cron scheduler initialized")
 	return c
 }
