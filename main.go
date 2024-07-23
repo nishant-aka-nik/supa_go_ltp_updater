@@ -20,6 +20,8 @@ func main() {
 	// Initialize the cron scheduler
 	c := InitCronScheduler()
 
+	RunServiceOnStartup()
+
 	// Defer the stop of the cron scheduler to ensure it stops when main function exits
 	defer c.Stop()
 	select {}
@@ -31,6 +33,10 @@ func initService() {
 		fmt.Println("Failed to load config:", err)
 		return
 	}
+}
+
+func RunServiceOnStartup() {
+	service.CronLtpUpdater()
 }
 
 // InitCronScheduler initializes and starts the cron scheduler
