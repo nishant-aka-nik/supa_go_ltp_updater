@@ -2,6 +2,7 @@ package stocks
 
 import (
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"strings"
 	"supa_go_ltp_updater/config"
 	"supa_go_ltp_updater/model"
+	"time"
 )
 
 func GetStocks() []model.Stock {
@@ -88,7 +90,8 @@ func mapToStock(row map[string]string) (model.Stock, error) {
 
 		if value, ok := row[jsonTag]; ok {
 			fieldValue := stockValue.Field(i)
-			switch fieldValue.Kind() {
+			x := fieldValue.Kind()
+			switch x {
 			case reflect.String:
 				fieldValue.SetString(value)
 			case reflect.Float64:
@@ -97,6 +100,17 @@ func mapToStock(row map[string]string) (model.Stock, error) {
 				} else {
 					return stock, err
 				}
+			case reflect.Struct:
+				if fieldValue.Type() == reflect.TypeOf(time.Time{}) {
+					layout := "02/01/2006"
+					if parsedDate, err := time.Parse(layout, value); err == nil {
+						fieldValue.Set(reflect.ValueOf(parsedDate))
+					} else {
+						return stock, err
+					}
+				}
+			default:
+				return stock, errors.New("unsupported field type")
 			}
 		}
 	}

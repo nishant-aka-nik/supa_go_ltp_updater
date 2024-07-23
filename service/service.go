@@ -29,10 +29,10 @@ func CronLtpUpdater() {
 	swingLogs := supabase.GetLogsFromSupbase()
 
 	//check for stoploss hit and send notification
-	watch.WatchStoplossHit(stocksData, symbolToLtpMap, swingLogs)
+	watch.StoplossHit(stocksData, symbolToLtpMap, swingLogs)
 
 	//check for target hit and send notification
-	watch.WatchTargetHit(stocksData, symbolToLtpMap, swingLogs)
+	watch.TargetHit(stocksData, symbolToLtpMap, swingLogs)
 
 	// log execution time
 	end := time.Now()

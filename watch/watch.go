@@ -5,7 +5,7 @@ import (
 	"supa_go_ltp_updater/model"
 )
 
-func WatchStoplossHit(stocksData []model.Stock, symbolToLtpMap map[string]float64, swingLogs []model.SwingLog) {
+func StoplossHit(stocksData []model.Stock, symbolToLtpMap map[string]float64, swingLogs []model.SwingLog) {
 	for _, swingLog := range swingLogs {
 		ltp, ok := symbolToLtpMap[swingLog.Symbol]
 		if !ok {
@@ -20,7 +20,7 @@ func WatchStoplossHit(stocksData []model.Stock, symbolToLtpMap map[string]float6
 	}
 }
 
-func WatchTargetHit(stocksData []model.Stock, symbolToLtpMap map[string]float64, swingLogs []model.SwingLog) {
+func TargetHit(stocksData []model.Stock, symbolToLtpMap map[string]float64, swingLogs []model.SwingLog) {
 	for _, swingLog := range swingLogs {
 		ltp, ok := symbolToLtpMap[swingLog.Symbol]
 		if !ok {

@@ -32,6 +32,7 @@ func LtpUpdater(stocksData []model.Stock) {
 			"last_traded_price": record.LTP,
 			"change_pct":        record.ChangePercentage,
 			"symbol":            record.Symbol,
+			"volume_times":      record.VolumeTimes,
 		}
 
 		if _, ok := symbolsMap[record.Symbol]; !ok {
