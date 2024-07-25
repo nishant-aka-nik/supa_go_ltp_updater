@@ -37,7 +37,7 @@ func TargetHit(stocksData []model.Stock, symbolToLtpMap map[string]float64, swin
 func GetSymbolToLtpMap(stocksData []model.Stock) map[string]float64 {
 	var symbolToLtpMap = make(map[string]float64)
 	for _, stock := range stocksData {
-		symbolToLtpMap[stock.Symbol] = stock.LTP
+		symbolToLtpMap[stock.Symbol] = stock.Close
 	}
 	return symbolToLtpMap
 }

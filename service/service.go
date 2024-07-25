@@ -20,7 +20,7 @@ func CronLtpUpdater() {
 	log.Printf("--------------------------xxx--------------------------")
 
 	// update last traded price in supabase
-	supabase.LtpUpdater(stocksData)
+	go supabase.LtpUpdater(stocksData)
 
 	// get symbol to ltp map from stocks data
 	symbolToLtpMap := watch.GetSymbolToLtpMap(stocksData)
