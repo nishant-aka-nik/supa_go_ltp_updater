@@ -9,6 +9,17 @@ entry alerter -
 - keep tracking the price against pivot point
 - issues - we have to think something about retracement pattern by code 
 
+TODO:
+entry filter - 
+- volume > 2.5
+- change pct > 2.5
+- green candle 
+- (price_away_from_52high == difference_between_high_and_close) < 2
+
+TODO: 
+add all the filtered stocks to a analysis table then we will take the percentage difference between current price and entry price 
+we will see the total profit whether it will work or not
+
 TODO: 
 - write code to make the "last_traded_price" to be updated using go routines
 - write code to upsert data to historic prices table every working day at 5 pm

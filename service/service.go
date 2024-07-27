@@ -19,9 +19,6 @@ func CronLtpUpdater() {
 	log.Printf("Fetched stocks data: %v", stocksData)
 	log.Printf("--------------------------xxx--------------------------")
 
-	// update last traded price in supabase
-	go supabase.LtpUpdater(stocksData)
-
 	// get symbol to ltp map from stocks data
 	symbolToLtpMap := watch.GetSymbolToLtpMap(stocksData)
 
@@ -33,6 +30,9 @@ func CronLtpUpdater() {
 
 	//check for target hit and send notification
 	watch.TargetHit(stocksData, symbolToLtpMap, swingLogs)
+
+	// update last traded price in supabase
+	supabase.LtpUpdater(stocksData)
 
 	// log execution time
 	end := time.Now()

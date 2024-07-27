@@ -29,19 +29,16 @@ func LtpUpdater(stocksData []model.Stock) {
 	// Perform the update operation
 	for _, record := range stocksData {
 		payload := map[string]interface{}{
-			"close": record.Close,
-			"change_pct":        record.ChangePercentage,
-			"symbol":            record.Symbol,
-			"volume_times":      record.VolumeTimes,
-			"high52":            record.High52,
-			"high":              record.High,
-			"low":               record.Low,
-			"open":              record.Open,
-			"date":              record.Date,
-			"daily_avg_volume":  record.DailyAvgVolume,
-			"price_away_from_52": record.PriceAwayFrom52High,
-			"data_delay":        record.DataDelay,
-			"volume":            record.Volume,
+			"close":            record.Close,
+			"change_pct":       record.ChangePercentage,
+			"symbol":           record.Symbol,
+			"high52":           record.High52,
+			"high":             record.High,
+			"low":              record.Low,
+			"open":             record.Open,
+			"date":             record.Date,
+			"daily_avg_volume": record.DailyAvgVolume,
+			"volume":           record.Volume,
 		}
 
 		if _, ok := symbolsMap[record.Symbol]; !ok {
