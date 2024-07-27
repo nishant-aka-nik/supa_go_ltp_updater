@@ -12,6 +12,14 @@ type Config struct {
 	GsheetUrl string   `json:"gsheetUrl"`
 	Supabase  Supabase `json:"supabase"`
 	CronSpec  string   `json:"cronSpec"`
+	Email     SMTP    `json:"email"`
+}
+
+type SMTP struct {
+	SMTPServer string `json:"smtp_server"`
+	SMTPPort   int    `json:"smtp_port"`
+	SMTPEmail  string `json:"smtp_email"`
+	SMTPPass   string `json:"smtp_pass"`
 }
 
 type Supabase struct {

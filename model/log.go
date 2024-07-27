@@ -9,7 +9,8 @@ type SwingLog struct {
 }
 
 type Account struct {
-	Name     string  `json:"name"`
-	UserID   string  `json:"user_id"`
-	UserEmail string `json:"user_email"`
+	Name           string `json:"name"`
+	UserID         string `json:"user_id"`
+	UserEmail      string `json:"user_email"`
+	SecondaryEmail string `json:"secondary_email"`
 }

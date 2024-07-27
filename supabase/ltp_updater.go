@@ -12,7 +12,7 @@ func LtpUpdater(stocksData []model.Stock) {
 	client := GetSupabaseClient()
 
 	// Define the table and the update payload
-	table := "last_traded_price"
+	table := "todays_data"
 
 	var recordsInTable []model.Stock
 	//get all table records
@@ -29,10 +29,16 @@ func LtpUpdater(stocksData []model.Stock) {
 	// Perform the update operation
 	for _, record := range stocksData {
 		payload := map[string]interface{}{
-			"last_traded_price": record.LTP,
-			"change_pct":        record.ChangePercentage,
-			"symbol":            record.Symbol,
-			"volume_times":      record.VolumeTimes,
+			"close":            record.Close,
+			"change_pct":       record.ChangePercentage,
+			"symbol":           record.Symbol,
+			"high52":           record.High52,
+			"high":             record.High,
+			"low":              record.Low,
+			"open":             record.Open,
+			"date":             record.Date,
+			"daily_avg_volume": record.DailyAvgVolume,
+			"volume":           record.Volume,
 		}
 
 		if _, ok := symbolsMap[record.Symbol]; !ok {
