@@ -32,3 +32,8 @@ func (s Stock) GetPercentageDifferenceBetweenHighAndClose() float64 {
 	percentage := ((s.High - s.Close) / s.High) * 100
 	return utils.FormatToTwoDecimalPlaces(percentage)
 }
+
+func (s Stock) GetPercentageDifferenceBetweenOpenAndClose() float64 {
+	percentage := ((s.Close - s.Open) / s.Open) * 100
+	return utils.FormatToTwoDecimalPlaces(percentage)
+}

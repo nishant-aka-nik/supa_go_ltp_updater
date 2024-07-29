@@ -37,6 +37,7 @@ func initService() {
 
 func RunServiceOnStartup() {
 	service.CronLtpUpdater()
+	service.FilterStocks()
 }
 
 // InitCronScheduler initializes and starts the cron scheduler
@@ -56,8 +57,16 @@ func InitCronScheduler() *cron.Cron {
 	)
 
 	// Add a cron job that runs every based on cron spec
-	log.Printf("Adding cron job with spec: %s\n", config.AppConfig.CronSpec)
-	cronEntryID, cronErr := c.AddFunc(config.AppConfig.CronSpec, service.CronLtpUpdater)
+	log.Printf("Adding cron job with spec: %s\n", config.AppConfig.CronSpec.LtpUpdaterCronSpec)
+	cronEntryID, cronErr := c.AddFunc(config.AppConfig.CronSpec.LtpUpdaterCronSpec, service.CronLtpUpdater)
+	if cronErr != nil {
+		log.Fatalf("Failed to add cron job: %v", cronErr)
+	}
+	log.Printf("Cron job added with ID: %d\n", cronEntryID)
+
+	// Add a cron job that runs every based on cron spec
+	log.Printf("Adding cron job with spec: %s\n", config.AppConfig.CronSpec.FilterStocksCronSpec)
+	cronEntryID, cronErr = c.AddFunc(config.AppConfig.CronSpec.FilterStocksCronSpec, service.FilterStocks)
 	if cronErr != nil {
 		log.Fatalf("Failed to add cron job: %v", cronErr)
 	}
