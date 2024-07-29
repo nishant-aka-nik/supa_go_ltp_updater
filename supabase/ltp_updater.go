@@ -4,6 +4,7 @@ import (
 	"log"
 	"supa_go_ltp_updater/config"
 	"supa_go_ltp_updater/model"
+	"supa_go_ltp_updater/notification"
 
 	"github.com/nedpals/supabase-go"
 )
@@ -123,9 +124,16 @@ func InsertFilterStocks(stocksData []model.Stock, tableName string) {
 		symbolsMap[record.Symbol] = struct{}{}
 	}
 
+	var emailList = make(notification.EmailList, 0)
+
 	// Perform the update operation
 	for _, record := range stocksData {
 		if _, ok := symbolsMap[record.Symbol]; !ok {
+
+			// filter stock to email list
+			email := notification.FilteredStockToEmail(record, "Filter Stocks")
+			emailList.PushEmail(email)
+
 			payload := map[string]interface{}{
 				"close":            record.Close,
 				"change_pct":       record.ChangePercentage,
@@ -147,6 +155,8 @@ func InsertFilterStocks(stocksData []model.Stock, tableName string) {
 			}
 		}
 	}
+
+	notification.SendMails(emailList)
 
 	//TODO: add the exit updater also with tax calculation
 }

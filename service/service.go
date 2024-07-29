@@ -55,6 +55,7 @@ func FilterStocks() {
 
 	//filter stocks data
 	filterStocks := filter.FilterStocks(stocksData)
+
 	// update stocks data in supabase
 	supabase.InsertFilterStocks(filterStocks, "filter_history")
 
