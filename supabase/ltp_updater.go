@@ -4,19 +4,17 @@ import (
 	"log"
 	"supa_go_ltp_updater/config"
 	"supa_go_ltp_updater/model"
+	"supa_go_ltp_updater/notification"
 
 	"github.com/nedpals/supabase-go"
 )
 
-func LtpUpdater(stocksData []model.Stock) {
+func LtpUpdater(stocksData []model.Stock, tableName string) {
 	client := GetSupabaseClient()
-
-	// Define the table and the update payload
-	table := "todays_data"
 
 	var recordsInTable []model.Stock
 	//get all table records
-	selectErr := client.DB.From(table).Select("symbol").Execute(&recordsInTable)
+	selectErr := client.DB.From(tableName).Select("symbol").Execute(&recordsInTable)
 	if selectErr != nil {
 		log.Fatalf("Error selecting table: %v", selectErr)
 	}
@@ -44,7 +42,7 @@ func LtpUpdater(stocksData []model.Stock) {
 		if _, ok := symbolsMap[record.Symbol]; !ok {
 			log.Printf("Inserting record: %v\n", record)
 			var result []map[string]interface{}
-			err := client.DB.From(table).Insert(payload).Execute(&result)
+			err := client.DB.From(tableName).Insert(payload).Execute(&result)
 			if err != nil {
 				log.Fatalf("Error updating table: %v", err)
 			}
@@ -54,7 +52,7 @@ func LtpUpdater(stocksData []model.Stock) {
 		// FIXME: this needs to be optimised it is very slow 24s a lot
 		log.Printf("Updating record: %v\n", record)
 		var result []map[string]interface{}
-		err := client.DB.From(table).Update(payload).Eq("symbol", record.Symbol).Execute(&result)
+		err := client.DB.From(tableName).Update(payload).Eq("symbol", record.Symbol).Execute(&result)
 		if err != nil {
 			log.Fatalf("Error updating table: %v for records: %#v", err, record)
 		}
@@ -109,4 +107,56 @@ func GetLogsFromSupbase() []model.SwingLog {
 	}
 
 	return recordsInTable
+}
+
+func InsertFilterStocks(stocksData []model.Stock, tableName string) {
+	client := GetSupabaseClient()
+
+	var recordsInTable []model.Stock
+	//get all table records
+	selectErr := client.DB.From(tableName).Select("symbol").Eq("active", "TRUE").Execute(&recordsInTable)
+	if selectErr != nil {
+		log.Fatalf("Error selecting table: %v", selectErr)
+	}
+
+	var symbolsMap = make(map[string]struct{})
+	for _, record := range recordsInTable {
+		symbolsMap[record.Symbol] = struct{}{}
+	}
+
+	var emailList = make(notification.EmailList, 0)
+
+	// Perform the update operation
+	for _, record := range stocksData {
+		if _, ok := symbolsMap[record.Symbol]; !ok {
+
+			// filter stock to email list
+			email := notification.FilteredStockToEmail(record, "Filter Stocks")
+			emailList.PushEmail(email)
+
+			payload := map[string]interface{}{
+				"close":            record.Close,
+				"change_pct":       record.ChangePercentage,
+				"symbol":           record.Symbol,
+				"high52":           record.High52,
+				"high":             record.High,
+				"low":              record.Low,
+				"open":             record.Open,
+				"date":             record.Date,
+				"daily_avg_volume": record.DailyAvgVolume,
+				"volume":           record.Volume,
+				"active":           "TRUE",
+			}
+			log.Printf("Inserting record: %v\n", record)
+			var result []map[string]interface{}
+			err := client.DB.From(tableName).Insert(payload).Execute(&result)
+			if err != nil {
+				log.Fatalf("Error updating table: %v", err)
+			}
+		}
+	}
+
+	notification.SendMails(emailList)
+
+	//TODO: add the exit updater also with tax calculation
 }

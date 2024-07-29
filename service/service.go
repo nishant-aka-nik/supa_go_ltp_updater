@@ -2,6 +2,7 @@ package service
 
 import (
 	"log"
+	"supa_go_ltp_updater/filter"
 	"supa_go_ltp_updater/stocks"
 	"supa_go_ltp_updater/supabase"
 	"supa_go_ltp_updater/watch"
@@ -31,12 +32,39 @@ func CronLtpUpdater() {
 	//check for target hit and send notification
 	watch.TargetHit(stocksData, symbolToLtpMap, swingLogs)
 
-	// update last traded price in supabase
-	supabase.LtpUpdater(stocksData)
+	// update todays data in supabase
+	supabase.LtpUpdater(stocksData, "todays_data")
 
 	// log execution time
 	end := time.Now()
 	log.Printf("Job ended at: %s\n", end)
 	log.Printf("Job execution time: %v\n", end.Sub(start).Seconds())
 	log.Println("Finished running CronLtpUpdater")
+}
+
+func FilterStocks() {
+	start := time.Now()
+	log.Printf("FilterStocks Job started at: %s\n", start)
+	log.Println("Running FilterStocks")
+
+	// fetch stocks data from google sheets
+	stocksData := stocks.GetStocks()
+	log.Printf("--------------------------xxx--------------------------")
+	log.Printf("Fetched stocks data: %v", stocksData)
+	log.Printf("--------------------------xxx--------------------------")
+
+	//filter stocks data
+	filterStocks := filter.FilterStocks(stocksData)
+
+	// update stocks data in supabase
+	supabase.InsertFilterStocks(filterStocks, "filter_history")
+
+	// // update todays data in supabase
+	// supabase.LtpUpdater(stocksData, "todays_data")
+
+	// log execution time
+	end := time.Now()
+	log.Printf("Job ended at: %s\n", end)
+	log.Printf("Job execution time: %v\n", end.Sub(start).Seconds())
+	log.Println("Finished running FilterStocks")
 }

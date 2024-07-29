@@ -11,8 +11,13 @@ import (
 type Config struct {
 	GsheetUrl string   `json:"gsheetUrl"`
 	Supabase  Supabase `json:"supabase"`
-	CronSpec  string   `json:"cronSpec"`
-	Email     SMTP    `json:"email"`
+	CronSpec  CronSpec `json:"cronSpec"`
+	Email     SMTP     `json:"email"`
+}
+
+type CronSpec struct {
+	LtpUpdaterCronSpec   string `json:"ltpUpdateCronSpec"`
+	FilterStocksCronSpec string `json:"filterStocksCronSpec"`
 }
 
 type SMTP struct {
