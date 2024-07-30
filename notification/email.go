@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"supa_go_ltp_updater/config"
-	"supa_go_ltp_updater/model"
+	"time"
 
 	"gopkg.in/mail.v2"
 )
@@ -52,7 +52,7 @@ func SendMails(emailList EmailList) {
 		m.SetHeader("From", config.AppConfig.Email.SMTPEmail)
 		m.SetHeader("To", recipient.To)
 		m.SetHeader("Subject", recipient.Subject)
-		m.SetBody("text/plain", recipient.Body)
+		m.SetBody("text/html", recipient.Body)
 
 		if err := mail.Send(s, m); err != nil {
 			log.Printf("Could not send email to %s: %v", recipient, err)
@@ -63,12 +63,34 @@ func SendMails(emailList EmailList) {
 }
 
 // TODO: remove the and create a better fucntion later
-func FilteredStockToEmail(stocksData model.Stock, context string) Email {
-	email := Email{
-		To:      "nishantdotk@gmail.com",
-		Subject: context,
-		Body:    fmt.Sprintf("Got this stock: \n %s", stocksData.Symbol),
+func GetTopsPicksEmailList(filteredStockString []string) EmailList {
+	// Get the current date
+	now := time.Now()
+
+	// Format the date as "30 July 2024"
+	formattedDate := now.Format("02 January 2006")
+
+	emails := []string{"nishantkumar9995@gmail.com", "nishantdotk@gmail.com"}
+	emailList := EmailList{}
+
+	// Build the HTML body with a list of stocks
+	body := `<p>Below are Top Picks for today:</p>
+             <ul>`
+
+	for _, stock := range filteredStockString {
+		link := "https://finance.yahoo.com/chart/" + stock + ".NS"
+		body += `<li><a href="` + link + `">` + stock + `</a></li>`
 	}
 
-	return email
+	body += `</ul>`
+
+	for _, email := range emails {
+		emailList = emailList.PushEmail(Email{
+			To:      email,
+			Subject: fmt.Sprintf("Tops Picks 🚀 %s", formattedDate),
+			Body:    body,
+		})
+	}
+
+	return emailList
 }
