@@ -3,8 +3,8 @@ version: '3.8'
 
 services:
   app:
-    container_name: StockNet
-    image: 9919952021/ltp_updater:latest
+    container_name: Argus
+    image: 9919952021/argus:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -13,10 +13,10 @@ services:
     restart: always
 
 # to build the image
-# docker build -t 9919952021/ltp_updater:latest .
+# docker build -t 9919952021/argus:latest .
 
 # to login to docker hub
 # docker login
 
 # to push the image
-# docker push 9919952021/ltp_updater:latest
+# docker push 9919952021/argus:latest

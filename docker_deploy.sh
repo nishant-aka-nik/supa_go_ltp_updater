@@ -2,7 +2,7 @@
 
 # Build the Docker image
 echo "Building Docker image..."
-docker build -t 9919952021/ltp_updater:latest .
+docker build -t 9919952021/argus:latest .
 
 # Check if the build was successful
 if [ $? -ne 0 ]; then
@@ -22,7 +22,7 @@ fi
 
 # Push the Docker image to Docker Hub
 echo "Pushing Docker image..."
-docker push 9919952021/ltp_updater:latest
+docker push 9919952021/argus:latest
 
 # Check if the push was successful
 if [ $? -ne 0 ]; then
