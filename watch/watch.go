@@ -5,6 +5,7 @@ import (
 	"log"
 	"supa_go_ltp_updater/model"
 	"supa_go_ltp_updater/notification"
+	"supa_go_ltp_updater/supabase"
 )
 
 func StoplossHit(stocksData []model.Stock, symbolToLtpMap map[string]float64, swingLogs []model.SwingLog) {
@@ -42,6 +43,8 @@ func StoplossHit(stocksData []model.Stock, symbolToLtpMap map[string]float64, sw
 func TargetHit(stocksData []model.Stock, symbolToLtpMap map[string]float64, swingLogs []model.SwingLog) {
 	emailist := notification.EmailList{}
 
+	swingLogsToBeUpdated := []model.SwingLog{}
+
 	for _, swingLog := range swingLogs {
 		ltp, ok := symbolToLtpMap[swingLog.Symbol]
 		if !ok {
@@ -49,16 +52,35 @@ func TargetHit(stocksData []model.Stock, symbolToLtpMap map[string]float64, swin
 			continue
 		}
 		if ltp > swingLog.Target {
-			email := notification.Email{
-				To:      swingLog.Account.UserEmail,
-				Subject: "Target Hit",
-				Body:    fmt.Sprintf("Target hit for %s", swingLog.Symbol),
+
+			newStoploss := ltp - (ltp * 0.1)
+			swingLog.Stoploss = newStoploss
+			newTarget := ltp + (ltp * 0.05)
+			swingLog.Target = newTarget
+			swingLog.Pivot = ltp
+
+			emails := []string{swingLog.Account.UserEmail, swingLog.Account.SecondaryEmail}
+
+			for _, email := range emails {
+				if email == "" {
+					continue
+				}
+				email := notification.Email{
+					To:      email,
+					Subject: "Target Hit",
+					Body:    fmt.Sprintf("Target hit for %v at %v \nNew Stoploss: %v (10 percent) \nNew Target: %v (5 percent)", swingLog.Symbol, ltp, swingLog.Stoploss, swingLog.Target),
+				}
+				emailist = emailist.PushEmail(email)
 			}
-			emailist = emailist.PushEmail(email)
+
+			swingLogsToBeUpdated = append(swingLogsToBeUpdated, swingLog)
+
 		}
 	}
 
 	notification.SendMails(emailist.GetEmails())
+	supabase.TargetUpdater(swingLogsToBeUpdated, "swinglog")
+
 }
 
 func GetSymbolToLtpMap(stocksData []model.Stock) map[string]float64 {

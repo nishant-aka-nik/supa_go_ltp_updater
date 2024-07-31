@@ -2,6 +2,7 @@ package supabase
 
 import (
 	"log"
+	"strconv"
 	"supa_go_ltp_updater/config"
 	"supa_go_ltp_updater/model"
 	"supa_go_ltp_updater/notification"
@@ -124,16 +125,13 @@ func InsertFilterStocks(stocksData []model.Stock, tableName string) {
 		symbolsMap[record.Symbol] = struct{}{}
 	}
 
-	var emailList = make(notification.EmailList, 0)
+	var filteredStockString []string
 
 	// Perform the update operation
 	for _, record := range stocksData {
+		filteredStockString = append(filteredStockString, record.Symbol)
+
 		if _, ok := symbolsMap[record.Symbol]; !ok {
-
-			// filter stock to email list
-			email := notification.FilteredStockToEmail(record, "Filter Stocks")
-			emailList.PushEmail(email)
-
 			payload := map[string]interface{}{
 				"close":            record.Close,
 				"change_pct":       record.ChangePercentage,
@@ -156,7 +154,33 @@ func InsertFilterStocks(stocksData []model.Stock, tableName string) {
 		}
 	}
 
-	notification.SendMails(emailList)
+	if len(filteredStockString) > 0 {
+		notification.SendMails(notification.GetTopsPicksEmailList(filteredStockString))
+	}
 
 	//TODO: add the exit updater also with tax calculation
+}
+
+func TargetUpdater(stocksData []model.SwingLog, tableName string) {
+	if len(stocksData) == 0 {
+		log.Println("No records to update")
+		return
+	}
+
+	client := GetSupabaseClient()
+	// Perform the update operation
+	for _, record := range stocksData {
+		payload := map[string]interface{}{
+			"stoploss": record.Stoploss,
+			"target":   record.Target,
+			"pivot":    record.Pivot,
+		}
+
+		log.Printf("Updating target for record: %v\n", record)
+		var result []map[string]interface{}
+		err := client.DB.From(tableName).Update(payload).Eq("id", strconv.FormatInt(int64(record.ID), 10)).Execute(&result)
+		if err != nil {
+			log.Printf("Error in target updating table: %v for records: %#v", err, record)
+		}
+	}
 }
