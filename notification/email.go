@@ -70,7 +70,7 @@ func GetTopsPicksEmailList(filteredStockString []string) EmailList {
 	// Format the date as "30 July 2024"
 	formattedDate := now.Format("02 January 2006")
 
-	emails := []string{"nishantkumar9995@gmail.com", "nishantdotk@gmail.com"}
+	emails := []string{"nishantkumar9995@gmail.com", "nishantdotk@gmail.com", "saraswatimahato1998@gmail.com"}
 	emailList := EmailList{}
 
 	// Build the HTML body with a list of stocks

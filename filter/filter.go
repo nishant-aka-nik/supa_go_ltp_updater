@@ -14,11 +14,7 @@ func FilterStocks(stocksData []model.Stock) []model.Stock {
 
 		volumeTimes := stocksData[i].GetVolumeTimes()
 
-		if crossMatch &&
-			highCloseDiff < 2.5 &&
-			openCloseDiff > 2 && 
-			volumeTimes > 1.5 {
-
+		if crossMatch && volumeTimes > 1.5 && openCloseDiff > 2 && highCloseDiff < 2.5 {
 			filteredStocks = append(filteredStocks, stocksData[i])
 		}
 

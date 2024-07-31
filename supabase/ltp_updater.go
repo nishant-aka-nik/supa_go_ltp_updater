@@ -129,10 +129,9 @@ func InsertFilterStocks(stocksData []model.Stock, tableName string) {
 
 	// Perform the update operation
 	for _, record := range stocksData {
+		filteredStockString = append(filteredStockString, record.Symbol)
+
 		if _, ok := symbolsMap[record.Symbol]; !ok {
-
-			filteredStockString = append(filteredStockString, record.Symbol)
-
 			payload := map[string]interface{}{
 				"close":            record.Close,
 				"change_pct":       record.ChangePercentage,
