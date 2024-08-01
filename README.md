@@ -9,17 +9,20 @@ entry alerter -
 - keep tracking the price against pivot point
 - issues - we have to think something about retracement pattern by code 
 
-TODO:
+TODO: Done
 entry filter - 
-- volume > 2.5
-- change pct > 2.5
-- green candle 
-- (price_away_from_52high == difference_between_high_and_close) < 2
+- volume > 1.5
+- cross match
+- openCloseDiff > 2
+- highCloseDiff < 2.5
 
 TODO: 
-add all the filtered stocks to a analysis table then we will take the percentage difference between current price and entry price 
-we will see the total profit whether it will work or not
+ - add all the filtered stocks to a analysis table then we will take the percentage difference between current price and entry price 
+ - we will analyse the total profit whether it will work or not
+ - add new column - profit, in filter_history and argus will calculate the profit every day on it 
+ - add new column trade_completed bool it will also mark the exit of the stock when price cross down the 20 ema and we will not calculate the profit on these stocks
 
 TODO: 
 - write code to make the "last_traded_price" to be updated using go routines
 - write code to upsert data to historic prices table every working day at 5 pm
+- write a code to calculate 20 ema of the stock 
