@@ -57,6 +57,7 @@ func TargetHit(stocksData []model.Stock, symbolToLtpMap map[string]float64, swin
 			swingLog.Stoploss = newStoploss
 			newTarget := ltp + (ltp * 0.05)
 			swingLog.Target = newTarget
+			//FIXME: pivot is not used by ui yet
 			swingLog.Pivot = ltp
 
 			emails := []string{swingLog.Account.UserEmail, swingLog.Account.SecondaryEmail}

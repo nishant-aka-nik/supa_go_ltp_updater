@@ -5,8 +5,6 @@ import (
 	"strconv"
 	"supa_go_ltp_updater/config"
 	"supa_go_ltp_updater/model"
-	"supa_go_ltp_updater/notification"
-	"time"
 
 	"github.com/nedpals/supabase-go"
 )
@@ -109,74 +107,6 @@ func GetLogsFromSupbase() []model.SwingLog {
 	}
 
 	return recordsInTable
-}
-
-func InsertFilterStocks(stocksData []model.Stock, tableName string) {
-	client := GetSupabaseClient()
-
-	var recordsInTable []model.Stock
-	//get all table records
-	selectErr := client.DB.From(tableName).Select("symbol").Eq("active", "TRUE").Execute(&recordsInTable)
-	if selectErr != nil {
-		log.Fatalf("Error selecting table: %v", selectErr)
-	}
-
-	var symbolsMap = make(map[string]struct{})
-	for _, record := range recordsInTable {
-		symbolsMap[record.Symbol] = struct{}{}
-	}
-
-	var filteredStockString []string
-	var filteredStockSlice []model.Stock
-
-	// Perform the update operation
-	for _, record := range stocksData {
-		filteredStockString = append(filteredStockString, record.Symbol)
-		filteredStockSlice = append(filteredStockSlice, record)
-
-		if _, ok := symbolsMap[record.Symbol]; !ok {
-			payload := map[string]interface{}{
-				"close":            record.Close,
-				"change_pct":       record.ChangePercentage,
-				"symbol":           record.Symbol,
-				"high52":           record.High52,
-				"high":             record.High,
-				"low":              record.Low,
-				"open":             record.Open,
-				"date":             record.Date,
-				"daily_avg_volume": record.DailyAvgVolume,
-				"volume":           record.Volume,
-				"active":           "TRUE",
-			}
-			log.Printf("Inserting record: %v\n", record)
-			var result []map[string]interface{}
-			err := client.DB.From(tableName).Insert(payload).Execute(&result)
-			if err != nil {
-				log.Fatalf("Error updating table: %v", err)
-			}
-		}
-	}
-
-	if len(filteredStockSlice) > 0 {
-		today := time.Now()
-		log.Printf("--------------------------Top Picks for %v:--------------------------", today.Format("02 January 2006"))
-
-		for index, record := range filteredStockSlice {
-			log.Printf("--------------------------%v--------------------------", index+1)
-			log.Println("Symbol: ", record.Symbol)
-			log.Println("Volume Times: ", record.GetVolumeTimes())
-			log.Println("Today's Price change percentage: ", record.GetPercentageDifferenceBetweenOpenAndClose())
-			log.Println("Percentage difference between high and close: ", record.GetPercentageDifferenceBetweenHighAndClose())
-		}
-		
-		log.Println("--------------------------xxx--------------------------")
-	}
-
-	if len(filteredStockString) > 0 {
-		notification.SendMails(notification.GetTopsPicksEmailList(filteredStockString))
-	}
-
-	//TODO: add the exit updater also with tax calculation
 }
 
 func TargetUpdater(stocksData []model.SwingLog, tableName string) {

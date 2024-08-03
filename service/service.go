@@ -48,19 +48,36 @@ func FilterStocks() {
 	log.Println("Running FilterStocks")
 
 	// fetch stocks data from google sheets
-	stocksData := stocks.GetStocks()
+	latestStocksData := stocks.GetStocks()
 	log.Printf("--------------------------xxx--------------------------")
-	log.Printf("Fetched stocks data: %v", stocksData)
+	log.Printf("Fetched stocks data: %v", latestStocksData)
 	log.Printf("--------------------------xxx--------------------------")
 
-	//filter stocks data
-	filterStocks := filter.FilterStocks(stocksData)
+	// get active stocks
+	crossMatchedStocks := supabase.GetCrossMatchedStocks("filter_history")
 
-	// update stocks data in supabase
-	supabase.InsertFilterStocks(filterStocks, "filter_history")
+	// Alert Stage
+	filter.Alert(latestStocksData, crossMatchedStocks)
 
-	// // update todays data in supabase
-	// supabase.LtpUpdater(stocksData, "todays_data")
+	// Insert Stage
+	// filter cross match stocks
+	//FIXME: InsertCrossMatchedStocks should only do the insert operation in supabase
+	// FilterCrossMatchStocks shoud do all the calculation
+	// and write another general function to send mail
+	// incorporate these 2 function
+	// - InsertCrossMatchedStocks
+	// - EmailCrossMatchedStocks
+	// email bhejne ki jaroorat ni hai it will be too much annoying
+	// only refactor mode the calculation part from InsertCrossMatchedStocks to  FilterCrossMatchStocks 
+	filterStocks := filter.FilterCrossMatchStocks(latestStocksData)
+	// update cross match stocks data in supabase
+	supabase.InsertCrossMatchedStocks(filterStocks, "filter_history")
+
+	// Reset Stage
+	// filter reset stocks
+	resetStocks := filter.Reset(latestStocksData, crossMatchedStocks)
+	// update reset stocks data in supabase
+	supabase.Reset(resetStocks, "filter_history")
 
 	// log execution time
 	end := time.Now()

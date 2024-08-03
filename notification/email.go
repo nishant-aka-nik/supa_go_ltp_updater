@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"supa_go_ltp_updater/config"
+	"supa_go_ltp_updater/model"
 	"time"
 
 	"gopkg.in/mail.v2"
@@ -80,6 +81,38 @@ func GetTopsPicksEmailList(filteredStockString []string) EmailList {
 	for _, stock := range filteredStockString {
 		link := "https://finance.yahoo.com/chart/" + stock + ".NS"
 		body += `<li><a href="` + link + `">` + stock + `</a></li>`
+	}
+
+	body += `</ul>`
+
+	for _, email := range emails {
+		emailList = emailList.PushEmail(Email{
+			To:      email,
+			Subject: fmt.Sprintf("Tops Picks 🚀 %s", formattedDate),
+			Body:    body,
+		})
+	}
+
+	return emailList
+}
+
+func GetEntryEmailList(filteredStockSlice []model.Stock) EmailList {
+	// Get the current date
+	now := time.Now()
+
+	// Format the date as "30 July 2024"
+	formattedDate := now.Format("02 January 2006")
+
+	emails := []string{"nishantkumar9995@gmail.com", "nishantdotk@gmail.com", "saraswatimahato1998@gmail.com"}
+	emailList := EmailList{}
+
+	// Build the HTML body with a list of stocks
+	body := `<p>Below are entry stock for today:</p>
+             <ul>`
+
+	for _, stock := range filteredStockSlice {
+		link := "https://finance.yahoo.com/chart/" + stock.Symbol + ".NS"
+		body += `<li><a href="` + link + `">` + stock.Symbol + `</a> - ` + fmt.Sprintf("%f", stock.GetVolumeTimes()) + `</li>`
 	}
 
 	body += `</ul>`

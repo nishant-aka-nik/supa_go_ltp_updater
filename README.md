@@ -26,3 +26,27 @@ TODO:
 - write code to make the "last_traded_price" to be updated using go routines
 - write code to upsert data to historic prices table every working day at 5 pm
 - write a code to calculate 20 ema of the stock 
+
+TODO:
+3 stage filtering
+
+- Alert
+    - has to be green candle
+    - query stock which are active
+    - if price is in between 2% of cross_match_pivot and 5% of cross_match_pivot and active == true
+    - active means it is near about equal to 52 week high
+    - before sending the alert mark the flag entry as true
+    - if not in entry band mark it as false for the UI top picks page 
+    - top picks will only show entry stocks
+    - volume > 1.5
+- Insert
+    - if cross_match == true of todays data insert the record with active = true and cross_match_pivot = ltp 
+    - and also check that this record is not present in the table and active != true
+    - meaning before inserting query all the records which are active and skip insertion
+    - volume > 1.5
+- Reset 
+    - if the active == true and red candle then mark the active = false
+
+- filter cron to start everyday at 2
+
+- it doesnt have to be accurate match cause we might miss good ones
