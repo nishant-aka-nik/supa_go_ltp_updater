@@ -5,6 +5,7 @@ import (
 	"log"
 	"supa_go_ltp_updater/config"
 	"supa_go_ltp_updater/service"
+	"supa_go_ltp_updater/utils"
 	"time"
 
 	"github.com/robfig/cron/v3"
@@ -42,12 +43,7 @@ func RunServiceOnStartup() {
 
 // InitCronScheduler initializes and starts the cron scheduler
 func InitCronScheduler() *cron.Cron {
-	// Create a new cron instance
-	istLocation, err := time.LoadLocation("Asia/Kolkata")
-	if err != nil {
-		log.Fatalf("Failed to load IST location: %v", err)
-	}
-	currentTime := time.Now().In(istLocation)
+	currentTime := utils.GetISTTime()
 	log.Printf("Initializing cron job at %v\n", currentTime)
 
 	c := cron.New(cron.WithLocation(time.FixedZone("IST", 5*60*60+30*60)),

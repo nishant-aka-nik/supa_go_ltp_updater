@@ -5,12 +5,12 @@ import (
 	"supa_go_ltp_updater/filter"
 	"supa_go_ltp_updater/stocks"
 	"supa_go_ltp_updater/supabase"
+	"supa_go_ltp_updater/utils"
 	"supa_go_ltp_updater/watch"
-	"time"
 )
 
 func CronLtpUpdater() {
-	start := time.Now()
+	start := utils.GetISTTime()
 	log.Printf("Job started at: %s\n", start)
 	log.Println("Running CronLtpUpdater")
 
@@ -36,14 +36,14 @@ func CronLtpUpdater() {
 	supabase.LtpUpdater(stocksData, "todays_data")
 
 	// log execution time
-	end := time.Now()
+	end := utils.GetISTTime()
 	log.Printf("Job ended at: %s\n", end)
 	log.Printf("Job execution time: %v\n", end.Sub(start).Seconds())
 	log.Println("Finished running CronLtpUpdater")
 }
 
 func FilterStocks() {
-	start := time.Now()
+	start := utils.GetISTTime()
 	log.Printf("FilterStocks Job started at: %s\n", start)
 	log.Println("Running FilterStocks")
 
@@ -63,12 +63,7 @@ func FilterStocks() {
 	// filter cross match stocks
 	//FIXME: InsertCrossMatchedStocks should only do the insert operation in supabase
 	// FilterCrossMatchStocks shoud do all the calculation
-	// and write another general function to send mail
-	// incorporate these 2 function
-	// - InsertCrossMatchedStocks
-	// - EmailCrossMatchedStocks
-	// email bhejne ki jaroorat ni hai it will be too much annoying
-	// only refactor mode the calculation part from InsertCrossMatchedStocks to  FilterCrossMatchStocks 
+	// only refactor the calculation part from InsertCrossMatchedStocks to FilterCrossMatchStocks
 	filterStocks := filter.FilterCrossMatchStocks(latestStocksData)
 	// update cross match stocks data in supabase
 	supabase.InsertCrossMatchedStocks(filterStocks, "filter_history")
@@ -80,7 +75,7 @@ func FilterStocks() {
 	supabase.Reset(resetStocks, "filter_history")
 
 	// log execution time
-	end := time.Now()
+	end := utils.GetISTTime()
 	log.Printf("Job ended at: %s\n", end)
 	log.Printf("Job execution time: %v\n", end.Sub(start).Seconds())
 	log.Println("Finished running FilterStocks")
