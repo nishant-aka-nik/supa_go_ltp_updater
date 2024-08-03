@@ -12,6 +12,8 @@ services:
       - "1920:8080"
     restart: always
 
+#icon url - https://icon-icons.com/downloadimage.php?id=263043&root=4216/PNG/512/&file=marketing_strategy_finance_chart_laptop_management_business_icon_263043.png
+
 # to build the image
 # docker build -t 9919952021/argus:latest .
 
