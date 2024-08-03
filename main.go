@@ -30,7 +30,7 @@ func main() {
 func initService() {
 	err := config.LoadConfig()
 	if err != nil {
-		fmt.Println("Failed to load config:", err)
+		log.Fatalf("Failed to load config: %v", err)
 		return
 	}
 }
