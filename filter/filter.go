@@ -44,8 +44,10 @@ func Alert(latestStocksData []model.Stock, crossMatchedStocks []model.Stock) {
 
 		entryStart := crossMatchedStockMap[stock.Symbol].GetEntry()
 		id := crossMatchedStockMap[stock.Symbol].Id
+		highCloseDiff := stock.GetPercentageDifferenceBetweenHighAndClose()
+		openCloseDiff := stock.GetPercentageDifferenceBetweenOpenAndClose()
 
-		if stock.Close > entryStart && stock.GetVolumeTimes() > 1.5 {
+		if stock.Close > entryStart && stock.GetVolumeTimes() > 1.5 && openCloseDiff > highCloseDiff && openCloseDiff > 0 {
 			filteredStockSlice = append(filteredStockSlice, stock)
 
 			//---------------
