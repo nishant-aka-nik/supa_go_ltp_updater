@@ -33,7 +33,7 @@ func InsertCrossMatchedStocks(stocksData []model.Stock, tableName string) {
 				"high":              record.High,
 				"low":               record.Low,
 				"open":              record.Open,
-				"date":              record.Date,
+				"date":              record.FormatDate(record.Date),
 				"daily_avg_volume":  record.DailyAvgVolume,
 				"volume":            record.Volume,
 				"cross_match":       record.CrossMatch,
