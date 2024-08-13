@@ -68,6 +68,10 @@ func FilterStocks() {
 	// update cross match stocks data in supabase
 	supabase.InsertCrossMatchedStocks(filterStocks, "filter_history")
 
+	//FIXME: need to add trailing stoploss code to update the data in supabase when target is hit
+	//currently i am doing only reset when stoploss is hit but not the updation of stoploss when target is hit 
+
+
 	// Reset Stage
 	// filter reset stocks
 	resetStocks := filter.Reset(latestStocksData, crossMatchedStocks)
