@@ -52,17 +52,25 @@ func InitCronScheduler() *cron.Cron {
 				cron.SecondOptional|cron.Minute|cron.Hour|cron.Dom|cron.Month|cron.Dow)),
 	)
 
-	// Add a cron job that runs every based on cron spec
-	log.Printf("Adding cron job with spec: %s\n", config.AppConfig.CronSpec.LtpUpdaterCronSpec)
+	// LTP updater cron job
+	log.Printf("Adding LTP updater cron job with spec: %s\n", config.AppConfig.CronSpec.LtpUpdaterCronSpec)
 	cronEntryID, cronErr := c.AddFunc(config.AppConfig.CronSpec.LtpUpdaterCronSpec, service.CronLtpUpdater)
 	if cronErr != nil {
 		log.Fatalf("Failed to add cron job: %v", cronErr)
 	}
 	log.Printf("Cron job added with ID: %d\n", cronEntryID)
 
-	// Add a cron job that runs every based on cron spec
-	log.Printf("Adding cron job with spec: %s\n", config.AppConfig.CronSpec.FilterStocksCronSpec)
+	// Filter stocks cron job
+	log.Printf("Adding filter stocks cron job with spec: %s\n", config.AppConfig.CronSpec.FilterStocksCronSpec)
 	cronEntryID, cronErr = c.AddFunc(config.AppConfig.CronSpec.FilterStocksCronSpec, service.FilterStocks)
+	if cronErr != nil {
+		log.Fatalf("Failed to add cron job: %v", cronErr)
+	}
+	log.Printf("Cron job added with ID: %d\n", cronEntryID)
+
+	// Target hit cron job
+	log.Printf("Adding target hit cron job with spec: %s\n", config.AppConfig.CronSpec.TargetHitCronSpec)
+	cronEntryID, cronErr = c.AddFunc(config.AppConfig.CronSpec.FilterStocksCronSpec, service.TargetHitCheckerCron)
 	if cronErr != nil {
 		log.Fatalf("Failed to add cron job: %v", cronErr)
 	}

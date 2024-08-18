@@ -29,9 +29,6 @@ func CronLtpUpdater() {
 	//check for stoploss hit and send notification
 	watch.StoplossHit(stocksData, symbolToLtpMap, swingLogs)
 
-	//check for target hit and send notification
-	watch.TargetHit(stocksData, symbolToLtpMap, swingLogs)
-
 	// update todays data in supabase
 	supabase.LtpUpdater(stocksData, "todays_data")
 
@@ -83,4 +80,31 @@ func FilterStocks() {
 	log.Printf("Job ended at: %s\n", end)
 	log.Printf("Job execution time: %v\n", end.Sub(start).Seconds())
 	log.Println("Finished running FilterStocks")
+}
+
+func TargetHitCheckerCron() {
+	start := utils.GetISTTime()
+	log.Printf("Job started at: %s\n", start)
+	log.Println("Running CronLtpUpdater")
+
+	// fetch stocks data from google sheets
+	stocksData := stocks.GetStocks()
+	log.Printf("--------------------------xxx--------------------------")
+	log.Printf("Fetched stocks data: %v", stocksData)
+	log.Printf("--------------------------xxx--------------------------")
+
+	// get symbol to ltp map from stocks data
+	symbolToLtpMap := watch.GetSymbolToLtpMap(stocksData)
+
+	// get swing logs from supabase
+	swingLogs := supabase.GetLogsFromSupbase()
+
+	//check for target hit and send notification
+	watch.TargetHit(stocksData, symbolToLtpMap, swingLogs)
+
+	// log execution time
+	end := utils.GetISTTime()
+	log.Printf("Job ended at: %s\n", end)
+	log.Printf("Job execution time: %v\n", end.Sub(start).Seconds())
+	log.Println("Finished running CronLtpUpdater")
 }

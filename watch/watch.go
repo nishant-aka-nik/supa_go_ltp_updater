@@ -3,6 +3,7 @@ package watch
 import (
 	"fmt"
 	"log"
+	"supa_go_ltp_updater/config"
 	"supa_go_ltp_updater/model"
 	"supa_go_ltp_updater/notification"
 	"supa_go_ltp_updater/supabase"
@@ -51,11 +52,12 @@ func TargetHit(stocksData []model.Stock, symbolToLtpMap map[string]float64, swin
 			log.Printf("LTP not found for %s", swingLog.Symbol)
 			continue
 		}
-		if ltp > swingLog.Target {
 
-			newStoploss := ltp - (ltp * 0.1)
+		// check if target hit
+		if ltp > swingLog.Target {
+			newStoploss := ltp - (ltp * (config.AppConfig.StoplossPercentage / 100))
 			swingLog.Stoploss = newStoploss
-			newTarget := ltp + (ltp * 0.05)
+			newTarget := ltp + (ltp * (config.AppConfig.TargetPercentage / 100))
 			swingLog.Target = newTarget
 			//FIXME: pivot is not used by ui yet
 			swingLog.Pivot = ltp

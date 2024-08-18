@@ -9,15 +9,18 @@ import (
 )
 
 type Config struct {
-	GsheetUrl string   `json:"gsheetUrl"`
-	Supabase  Supabase `json:"supabase"`
-	CronSpec  CronSpec `json:"cronSpec"`
-	Email     SMTP     `json:"email"`
+	GsheetUrl          string   `json:"gsheetUrl"`
+	Supabase           Supabase `json:"supabase"`
+	CronSpec           CronSpec `json:"cronSpec"`
+	Email              SMTP     `json:"email"`
+	TargetPercentage   float64  `json:"targetPercentage"`
+	StoplossPercentage float64  `json:"stoplossPercentage"`
 }
 
 type CronSpec struct {
 	LtpUpdaterCronSpec   string `json:"ltpUpdateCronSpec"`
 	FilterStocksCronSpec string `json:"filterStocksCronSpec"`
+	TargetHitCronSpec    string `json:"targetHitCronSpec"`
 }
 
 type SMTP struct {
