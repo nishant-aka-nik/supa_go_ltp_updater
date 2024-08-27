@@ -99,7 +99,9 @@ func FilterCrossMatchStocks(latestStocksData []model.Stock) []model.Stock {
 
 		volumeTimes := latestStocksData[i].GetVolumeTimes()
 
-		if crossMatch && volumeTimes > 1.5 && openCloseDiff > 2 && highCloseDiff < 2.5 {
+		candleGreaterThanWick := openCloseDiff > highCloseDiff
+
+		if crossMatch && volumeTimes > 1.5 && openCloseDiff > 2 && candleGreaterThanWick {
 			latestStocksData[i].CrossMatch = true
 			latestStocksData[i].CrossMatchPivot = latestStocksData[i].High
 			filteredStocks = append(filteredStocks, latestStocksData[i])
