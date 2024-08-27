@@ -39,6 +39,7 @@ func initService() {
 func RunServiceOnStartup() {
 	service.CronLtpUpdater()
 	service.FilterStocks()
+	service.TargetHitCheckerCron()
 }
 
 // InitCronScheduler initializes and starts the cron scheduler

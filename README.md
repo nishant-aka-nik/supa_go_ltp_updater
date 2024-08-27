@@ -38,7 +38,7 @@ TODO:
     - before sending the alert mark the flag entry as true
     - if not in entry band mark it as false for the UI top picks page 
     - top picks will only show entry stocks
-    - volume > 1.5
+    - volume > 1.2
 - Insert
     - if cross_match == true of todays data insert the record with active = true and cross_match_pivot = ltp 
     - and also check that this record is not present in the table and active != true
@@ -50,3 +50,17 @@ TODO:
 - filter cron to start everyday at 2
 
 - it doesnt have to be accurate match cause we might miss good ones
+
+Changelog 24 Aug 2024: New Ideas
+ - More Dynamic Stoploss
+ - top picks should have 2 columns 
+    - active which should be not more than 3 days like 3 din tk to entryable rahega 
+    - uske baad vo chala jaega old top picks me
+ - health check mails
+
+DB Design
+- https://dbdiagram.io/d/Argus-6664a4a89713410b051854cf
+
+
+so when the close > 2% of cross match pivot we will set the entry true and make the crossmatch to false
+how we will mark the entry to be false 

@@ -48,7 +48,7 @@ func Alert(latestStocksData []model.Stock, crossMatchedStocks []model.Stock) {
 		openCloseDiff := stock.GetPercentageDifferenceBetweenOpenAndClose()
 
 		entry := stock.Close > entryStart
-		volume := stock.GetVolumeTimes() > 1.5
+		volume := stock.GetVolumeTimes() > 0.2
 		candleGreaterThanWick := openCloseDiff > highCloseDiff
 		greenCandle := openCloseDiff > 0
 
@@ -59,7 +59,9 @@ func Alert(latestStocksData []model.Stock, crossMatchedStocks []model.Stock) {
 			if !crossMatchedStockMap[stock.Symbol].Entry {
 				stoploss := stock.Close - (stock.Close * 0.1)
 				target := stock.Close + (stock.Close * 0.05)
-				supabase.MarkStoplossTargetEntry(stoploss, target, id, "filter_history")
+				entryPrice := stock.Close
+				entryDate := stock.FormatDate(stock.Date)
+				supabase.MarkStoplossTargetEntryCrossMatch(entryPrice, entryDate, stoploss, target, id, "filter_history")
 			}
 
 			//---------------
@@ -120,7 +122,9 @@ func Reset(latestStocksData []model.Stock, crossMatchedStocks []model.Stock) []m
 	for _, stock := range crossMatchedStocks {
 		LTP := latestStocksDataMap[stock.Symbol].Close
 
-		if LTP < stock.Stoploss {
+		price5PercentAbovePivot := LTP > (stock.CrossMatchPivot * 1.05)
+
+		if price5PercentAbovePivot {
 			stock.Entry = false
 			stock.CrossMatch = false
 			resetStocks = append(resetStocks, stock)

@@ -94,3 +94,26 @@ func GetEntryEmailList(filteredStockSlice []model.Stock) EmailList {
 
 	return emailList
 }
+
+func GetHealthCheckEmailList(runContext string) EmailList {
+	// Get the current date
+	now := time.Now()
+
+	// Format the date as "30 July 2024"
+	formattedDate := now.Format("02 January 2006")
+
+	emails := []string{"nishantkumar9995@gmail.com", "nishantdotk@gmail.com"}
+	emailList := EmailList{}
+
+	body := fmt.Sprintf("Argus ran for %s", runContext)
+
+	for _, email := range emails {
+		emailList = emailList.PushEmail(Email{
+			To:      email,
+			Subject: fmt.Sprintf("Argus Health Check 🚀 %s", formattedDate),
+			Body:    body,
+		})
+	}
+
+	return emailList
+}

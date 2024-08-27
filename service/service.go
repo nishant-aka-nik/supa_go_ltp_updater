@@ -3,6 +3,7 @@ package service
 import (
 	"log"
 	"supa_go_ltp_updater/filter"
+	"supa_go_ltp_updater/notification"
 	"supa_go_ltp_updater/stocks"
 	"supa_go_ltp_updater/supabase"
 	"supa_go_ltp_updater/utils"
@@ -66,14 +67,15 @@ func FilterStocks() {
 	supabase.InsertCrossMatchedStocks(filterStocks, "filter_history")
 
 	//FIXME: need to add trailing stoploss code to update the data in supabase when target is hit
-	//currently i am doing only reset when stoploss is hit but not the updation of stoploss when target is hit 
-
+	//currently i am doing only reset when stoploss is hit but not the updation of stoploss when target is hit
 
 	// Reset Stage
 	// filter reset stocks
 	resetStocks := filter.Reset(latestStocksData, crossMatchedStocks)
 	// update reset stocks data in supabase
 	supabase.Reset(resetStocks, "filter_history")
+
+	notification.SendMails(notification.GetHealthCheckEmailList("FilterStocks"))
 
 	// log execution time
 	end := utils.GetISTTime()
@@ -101,6 +103,8 @@ func TargetHitCheckerCron() {
 
 	//check for target hit and send notification
 	watch.TargetHit(stocksData, symbolToLtpMap, swingLogs)
+
+	notification.SendMails(notification.GetHealthCheckEmailList("TargetHitCheckerCron"))
 
 	// log execution time
 	end := utils.GetISTTime()

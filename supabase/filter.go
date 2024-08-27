@@ -62,13 +62,16 @@ func GetCrossMatchedStocks(tableName string) []model.Stock {
 	return recordsInTable
 }
 
-func MarkStoplossTargetEntry(stoploss float64, target float64, id int, tableName string) {
+func MarkStoplossTargetEntryCrossMatch(entryPrice float64, entryDate string, stoploss float64, target float64, id int, tableName string) {
 	client := GetSupabaseClient()
 
 	payload := map[string]interface{}{
-		"target":   target,
-		"stoploss": stoploss,
-		"entry":    "TRUE",
+		"target":      target,
+		"stoploss":    stoploss,
+		"entry":       "TRUE",
+		"cross_match": "FALSE",
+		"entry_date":  entryDate,
+		"entry_price": entryPrice,
 	}
 
 	var result []map[string]interface{}
