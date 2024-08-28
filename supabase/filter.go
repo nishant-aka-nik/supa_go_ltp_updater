@@ -26,16 +26,8 @@ func InsertCrossMatchedStocks(stocksData []model.Stock, tableName string) {
 
 		if _, ok := symbolsMap[record.Symbol]; !ok {
 			payload := map[string]interface{}{
-				"close":             record.Close,
-				"change_pct":        record.ChangePercentage,
 				"symbol":            record.Symbol,
-				"high52":            record.High52,
-				"high":              record.High,
-				"low":               record.Low,
-				"open":              record.Open,
-				"date":              record.FormatDate(record.Date),
-				"daily_avg_volume":  record.DailyAvgVolume,
-				"volume":            record.Volume,
+				"cross_match_date":  record.FormatDate(record.Date),
 				"cross_match":       record.CrossMatch,
 				"cross_match_pivot": record.CrossMatchPivot,
 			}
