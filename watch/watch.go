@@ -22,7 +22,7 @@ func StoplossHit(stocksData []model.Stock, symbolToLtpMap map[string]float64, sw
 		if ltp < swingLog.Stoploss {
 			email := notification.Email{
 				To:      swingLog.Account.UserEmail,
-				Subject: "Stoploss Hit",
+				Subject: "Stoploss Hit - Argus Alerts",
 				Body:    fmt.Sprintf("Stoploss hit for %s", swingLog.Symbol),
 			}
 			emailist = emailist.PushEmail(email)
@@ -30,7 +30,7 @@ func StoplossHit(stocksData []model.Stock, symbolToLtpMap map[string]float64, sw
 			if swingLog.Account.SecondaryEmail != "" {
 				email := notification.Email{
 					To:      swingLog.Account.UserEmail,
-					Subject: "Stoploss Hit",
+					Subject: "Stoploss Hit - Argus Alerts",
 					Body:    fmt.Sprintf("Stoploss hit for %s", swingLog.Symbol),
 				}
 				emailist = emailist.PushEmail(email)
@@ -70,7 +70,7 @@ func TargetHit(stocksData []model.Stock, symbolToLtpMap map[string]float64, swin
 				}
 				email := notification.Email{
 					To:      email,
-					Subject: "Target Hit",
+					Subject: "Target Hit - Argus Alerts",
 					Body:    fmt.Sprintf("Target hit for %v at %v \nNew Stoploss: %v (10 percent) \nNew Target: %v (5 percent)", swingLog.Symbol, ltp, swingLog.Stoploss, swingLog.Target),
 				}
 				emailist = emailist.PushEmail(email)
