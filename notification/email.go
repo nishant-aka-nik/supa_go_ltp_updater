@@ -63,39 +63,6 @@ func SendMails(emailList EmailList) {
 	}
 }
 
-// TODO: remove the and create a better fucntion later
-func GetTopsPicksEmailList(filteredStockString []string) EmailList {
-	// Get the current date
-	now := time.Now()
-
-	// Format the date as "30 July 2024"
-	formattedDate := now.Format("02 January 2006")
-
-	emails := []string{"nishantkumar9995@gmail.com", "nishantdotk@gmail.com", "saraswatimahato1998@gmail.com"}
-	emailList := EmailList{}
-
-	// Build the HTML body with a list of stocks
-	body := `<p>Below are Top Picks for today:</p>
-             <ul>`
-
-	for _, stock := range filteredStockString {
-		link := "https://finance.yahoo.com/chart/" + stock + ".NS"
-		body += `<li><a href="` + link + `">` + stock + `</a></li>`
-	}
-
-	body += `</ul>`
-
-	for _, email := range emails {
-		emailList = emailList.PushEmail(Email{
-			To:      email,
-			Subject: fmt.Sprintf("Tops Picks 🚀 %s", formattedDate),
-			Body:    body,
-		})
-	}
-
-	return emailList
-}
-
 func GetEntryEmailList(filteredStockSlice []model.Stock) EmailList {
 	// Get the current date
 	now := time.Now()
@@ -103,7 +70,7 @@ func GetEntryEmailList(filteredStockSlice []model.Stock) EmailList {
 	// Format the date as "30 July 2024"
 	formattedDate := now.Format("02 January 2006")
 
-	emails := []string{"nishantkumar9995@gmail.com", "nishantdotk@gmail.com", "saraswatimahato1998@gmail.com"}
+	emails := []string{"nishantkumar9995@gmail.com", "nishantdotk@gmail.com", "saraswatimahato1998@gmail.com", "shndamit25@gmail.com"}
 	emailList := EmailList{}
 
 	// Build the HTML body with a list of stocks
@@ -121,6 +88,29 @@ func GetEntryEmailList(filteredStockSlice []model.Stock) EmailList {
 		emailList = emailList.PushEmail(Email{
 			To:      email,
 			Subject: fmt.Sprintf("Tops Picks 🚀 %s", formattedDate),
+			Body:    body,
+		})
+	}
+
+	return emailList
+}
+
+func GetHealthCheckEmailList(runContext string) EmailList {
+	// Get the current date
+	now := time.Now()
+
+	// Format the date as "30 July 2024"
+	formattedDate := now.Format("02 January 2006")
+
+	emails := []string{"nishantkumar9995@gmail.com", "nishantdotk@gmail.com"}
+	emailList := EmailList{}
+
+	body := fmt.Sprintf("Argus ran for %s", runContext)
+
+	for _, email := range emails {
+		emailList = emailList.PushEmail(Email{
+			To:      email,
+			Subject: fmt.Sprintf("Argus Health Check 🚀 %s", formattedDate),
 			Body:    body,
 		})
 	}

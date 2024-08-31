@@ -1,9 +1,11 @@
 package filter
 
 import (
+	"log"
 	"supa_go_ltp_updater/model"
 	"supa_go_ltp_updater/notification"
 	"supa_go_ltp_updater/supabase"
+	"supa_go_ltp_updater/utils"
 )
 
 func FilterStocks(stocksData []model.Stock) []model.Stock {
@@ -42,18 +44,41 @@ func Alert(latestStocksData []model.Stock, crossMatchedStocks []model.Stock) {
 
 		entryStart := crossMatchedStockMap[stock.Symbol].GetEntry()
 		id := crossMatchedStockMap[stock.Symbol].Id
+		highCloseDiff := stock.GetPercentageDifferenceBetweenHighAndClose()
+		openCloseDiff := stock.GetPercentageDifferenceBetweenOpenAndClose()
 
-		if stock.Close > entryStart && stock.GetVolumeTimes() > 1.5 {
+		entry := stock.Close > entryStart
+		volume := stock.GetVolumeTimes() > 0.2
+		candleGreaterThanWick := openCloseDiff > highCloseDiff
+		greenCandle := openCloseDiff > 0
+
+		if entry && volume && candleGreaterThanWick && greenCandle {
 			filteredStockSlice = append(filteredStockSlice, stock)
 
 			//---------------
 			if !crossMatchedStockMap[stock.Symbol].Entry {
 				stoploss := stock.Close - (stock.Close * 0.1)
 				target := stock.Close + (stock.Close * 0.05)
-				supabase.MarkStoplossTargetEntry(stoploss, target, id, "filter_history")
+				entryPrice := stock.Close
+				entryDate := stock.FormatDate(stock.Date)
+				supabase.MarkStoplossTargetEntryCrossMatch(entryPrice, entryDate, stoploss, target, id, "filter_history")
 			}
 
 			//---------------
+			if len(filteredStockSlice) > 0 {
+				today := utils.GetISTTime()
+				log.Printf("--------------------------Top Picks for %v:--------------------------", today.Format("02 January 2006"))
+
+				for index, record := range filteredStockSlice {
+					log.Printf("--------------------------%v--------------------------", index+1)
+					log.Println("Symbol: ", record.Symbol)
+					log.Println("Volume Times: ", record.GetVolumeTimes())
+					log.Println("Today's Price change percentage: ", record.GetPercentageDifferenceBetweenOpenAndClose())
+					log.Println("Percentage difference between high and close: ", record.GetPercentageDifferenceBetweenHighAndClose())
+				}
+
+				log.Println("--------------------------xxx--------------------------")
+			}
 		}
 	}
 
@@ -74,7 +99,9 @@ func FilterCrossMatchStocks(latestStocksData []model.Stock) []model.Stock {
 
 		volumeTimes := latestStocksData[i].GetVolumeTimes()
 
-		if crossMatch && volumeTimes > 1.5 && openCloseDiff > 2 && highCloseDiff < 2.5 {
+		candleGreaterThanWick := openCloseDiff > highCloseDiff
+
+		if crossMatch && volumeTimes > 1.5 && openCloseDiff > 2 && candleGreaterThanWick {
 			latestStocksData[i].CrossMatch = true
 			latestStocksData[i].CrossMatchPivot = latestStocksData[i].High
 			filteredStocks = append(filteredStocks, latestStocksData[i])
@@ -97,7 +124,9 @@ func Reset(latestStocksData []model.Stock, crossMatchedStocks []model.Stock) []m
 	for _, stock := range crossMatchedStocks {
 		LTP := latestStocksDataMap[stock.Symbol].Close
 
-		if LTP < stock.Stoploss {
+		price5PercentAbovePivot := LTP > (stock.CrossMatchPivot * 1.05)
+
+		if price5PercentAbovePivot {
 			stock.Entry = false
 			stock.CrossMatch = false
 			resetStocks = append(resetStocks, stock)
