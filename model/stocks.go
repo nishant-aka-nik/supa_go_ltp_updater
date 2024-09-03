@@ -46,7 +46,7 @@ func (s Stock) GetPercentageDifferenceBetweenOpenAndClose() float64 {
 }
 
 func (s Stock) GetEntry() float64 {
-	return s.CrossMatchPivot + (s.CrossMatchPivot * 0.02)
+	return s.CrossMatchPivot + (s.CrossMatchPivot * 0.01)
 }
 
 func (s Stock) StoplossHit() bool {
