@@ -102,7 +102,7 @@ func GetHealthCheckEmailList(runContext string) EmailList {
 	// Format the date as "30 July 2024"
 	formattedDate := now.Format("02 January 2006")
 
-	emails := []string{"kurosensei@prontonmail.com"}
+	emails := []string{"nishantdotk@gmail.com"}
 	emailList := EmailList{}
 
 	body := fmt.Sprintf("Argus ran for %s", runContext)
