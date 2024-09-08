@@ -83,7 +83,7 @@ func Alert(latestStocksData []model.Stock, crossMatchedStocks []model.Stock) {
 	}
 
 	if len(filteredStockSlice) > 0 {
-		notification.SendMails(notification.GetEntryEmailList(filteredStockSlice))
+		notification.SendMails(notification.GetEntryEmailList(filteredStockSlice, "Breakout Entry"))
 	}
 }
 

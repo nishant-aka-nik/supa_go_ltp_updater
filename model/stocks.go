@@ -59,7 +59,7 @@ func (s Stock) TargetHit() bool {
 
 func (s Stock) FormatDate(dateStr string) string {
 	// Parse the input date string
-	t, err := time.Parse("02/01/2006", dateStr)
+	t, err := time.Parse("02/01/2006 15:04:05", dateStr)
 	if err != nil {
 		log.Fatalf("Error parsing date: %v", err)
 	}

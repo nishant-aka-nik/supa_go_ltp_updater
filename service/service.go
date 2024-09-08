@@ -2,7 +2,9 @@ package service
 
 import (
 	"log"
+	"supa_go_ltp_updater/config"
 	"supa_go_ltp_updater/filter"
+	"supa_go_ltp_updater/model"
 	"supa_go_ltp_updater/notification"
 	"supa_go_ltp_updater/stocks"
 	"supa_go_ltp_updater/supabase"
@@ -59,15 +61,9 @@ func FilterStocks() {
 
 	// Insert Stage
 	// filter cross match stocks
-	//FIXME: InsertCrossMatchedStocks should only do the insert operation in supabase
-	// FilterCrossMatchStocks shoud do all the calculation
-	// only refactor the calculation part from InsertCrossMatchedStocks to FilterCrossMatchStocks
 	filterStocks := filter.FilterCrossMatchStocks(latestStocksData)
 	// update cross match stocks data in supabase
 	supabase.InsertCrossMatchedStocks(filterStocks, "filter_history")
-
-	//FIXME: need to add trailing stoploss code to update the data in supabase when target is hit
-	//currently i am doing only reset when stoploss is hit but not the updation of stoploss when target is hit
 
 	// Reset Stage
 	// filter reset stocks
@@ -111,4 +107,98 @@ func TargetHitCheckerCron() {
 	log.Printf("Job ended at: %s\n", end)
 	log.Printf("Job execution time: %v\n", end.Sub(start).Seconds())
 	log.Println("Finished running CronLtpUpdater")
+}
+
+func Gaptor() {
+	start := utils.GetISTTime()
+	log.Printf("Job started at: %s\n", start)
+	log.Println("Running Gaptor")
+	log.Printf("start.Weekday(): %#v\n", start.Weekday())
+
+	// fetch stocks data from google sheets
+	stocksData := stocks.GetStocks()
+	log.Printf("--------------------------xxx--------------------------")
+	log.Printf("Fetched stocks data: %v", stocksData)
+	log.Printf("--------------------------xxx--------------------------")
+
+	// get previous day close data
+	previousDayDataSlice := supabase.GetPreviousDayData()
+	log.Printf("previousDayData: %#v\n", previousDayDataSlice)
+
+	//safeguard
+	if !filter.IsSafeToGapFilter(stocksData[0].Date, previousDayDataSlice[0].Date) {
+		return
+	}
+	//-----------------
+
+	symbolToPreviousDay3PercentUpCloseMap := make(map[string]model.PreviousDayData)
+
+	for _, previousDayData := range previousDayDataSlice {
+		threePercentUpPrice := utils.PercentageIncrease(previousDayData.Close, 3)
+		previousDayData.Close = threePercentUpPrice
+		symbolToPreviousDay3PercentUpCloseMap[previousDayData.Symbol] = previousDayData
+	}
+
+	var gapFilteredData []model.GapFilter
+
+	for _, stockData := range stocksData {
+		volumeTimes := stockData.GetVolumeTimes()
+
+		threePercentUpPrice := symbolToPreviousDay3PercentUpCloseMap[stockData.Symbol].Close
+
+		priceGap := stockData.Open > threePercentUpPrice
+		volumeGap := volumeTimes > 3
+
+		//GapPivot is the high on the gap day
+		if priceGap && volumeGap {
+			gapStock := model.GapFilter{
+				Date:        stockData.FormatDate(stockData.Date),
+				Symbol:      stockData.Symbol,
+				GapPivot:    stockData.High,
+				VolumeTimes: volumeTimes,
+				Entry:       false,
+			}
+
+			gapFilteredData = append(gapFilteredData, gapStock)
+		}
+	}
+
+	//update gapFilteredData into supabase
+	supabase.InsertGapFilteredStocks(gapFilteredData, config.AppConfig.TableNames.GapFilter)
+
+	//get all gapFilteredData from supabase and validate stockData.close > gappivot
+	// if stockData.close > gappivot trigger email
+	gapFilteredStocks := supabase.GetGapFilteredStocks()
+	log.Printf("gapFilteredStocks: %#v\n", gapFilteredStocks)
+
+	symbolToGapFilteredMap := make(map[string]model.GapFilter)
+	for _, gapFilteredStock := range gapFilteredStocks {
+		symbolToGapFilteredMap[gapFilteredStock.Symbol] = gapFilteredStock
+	}
+
+	var GapEntryStocks []model.Stock
+	for _, stockData := range stocksData {
+		gapPivot := symbolToGapFilteredMap[stockData.Symbol].GapPivot
+
+		entry := stockData.Close > (gapPivot + 2)
+
+		if entry {
+			GapEntryStocks = append(GapEntryStocks, stockData)
+		}
+	}
+
+	//alert via email
+	if len(GapEntryStocks) > 0 {
+		notification.SendMails(notification.GetEntryEmailList(GapEntryStocks, "Gap Entry"))
+		notification.SendMails(notification.GetEntryEmailList(GapEntryStocks, "Gap Entry"))
+	}
+
+	//update todays data to previous day data
+	supabase.PreviousDayDataUpdater(stocksData, config.AppConfig.TableNames.PreviousDayData)
+
+	// log execution time
+	end := utils.GetISTTime()
+	log.Printf("Job ended at: %s\n", end)
+	log.Printf("Job execution time: %v\n", end.Sub(start).Seconds())
+	log.Println("Finished running Gaptor")
 }

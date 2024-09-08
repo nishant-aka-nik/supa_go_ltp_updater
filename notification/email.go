@@ -63,7 +63,7 @@ func SendMails(emailList EmailList) {
 	}
 }
 
-func GetEntryEmailList(filteredStockSlice []model.Stock) EmailList {
+func GetEntryEmailList(filteredStockSlice []model.Stock, subject string) EmailList {
 	// Get the current date
 	now := time.Now()
 
@@ -87,7 +87,7 @@ func GetEntryEmailList(filteredStockSlice []model.Stock) EmailList {
 	for _, email := range emails {
 		emailList = emailList.PushEmail(Email{
 			To:      email,
-			Subject: fmt.Sprintf("Tops Picks 🚀 %s", formattedDate),
+			Subject: fmt.Sprintf("%s 🚀 %s", subject, formattedDate),
 			Body:    body,
 		})
 	}

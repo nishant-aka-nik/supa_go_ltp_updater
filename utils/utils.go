@@ -20,3 +20,8 @@ func GetISTTime() time.Time {
 	}
 	return time.Now().In(loc)
 }
+
+func PercentageIncrease(price float64, percentage float64) float64 {
+	price = price + (price * (percentage / 100))
+	return price
+}

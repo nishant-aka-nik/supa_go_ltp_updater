@@ -37,9 +37,17 @@ func initService() {
 }
 
 func RunServiceOnStartup() {
+	start := utils.GetISTTime()
+	// Check if today is Saturday (6) or Sunday (0)
+	if start.Weekday() == time.Saturday || start.Weekday() == time.Sunday {
+		log.Println("It's the weekend! Skipping execution.")
+		return // Skip further execution
+	}
+
 	service.CronLtpUpdater()
 	service.FilterStocks()
 	service.TargetHitCheckerCron()
+	service.Gaptor()
 }
 
 // InitCronScheduler initializes and starts the cron scheduler
