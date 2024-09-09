@@ -85,6 +85,14 @@ func InitCronScheduler() *cron.Cron {
 	}
 	log.Printf("Cron job added with ID: %d\n", cronEntryID)
 
+	// Target hit cron job
+	log.Printf("Adding gaptor cron job with spec: %s\n", config.AppConfig.CronSpec.GaptorCronSpec)
+	cronEntryID, cronErr = c.AddFunc(config.AppConfig.CronSpec.FilterStocksCronSpec, service.Gaptor)
+	if cronErr != nil {
+		log.Fatalf("Failed to add cron job: %v", cronErr)
+	}
+	log.Printf("Cron job added with ID: %d\n", cronEntryID)
+
 	// Start the cron scheduler
 	log.Println("Starting cron scheduler")
 	c.Start()

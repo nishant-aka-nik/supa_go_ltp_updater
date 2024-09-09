@@ -27,6 +27,7 @@ type CronSpec struct {
 	LtpUpdaterCronSpec   string `json:"ltpUpdateCronSpec"`
 	FilterStocksCronSpec string `json:"filterStocksCronSpec"`
 	TargetHitCronSpec    string `json:"targetHitCronSpec"`
+	GaptorCronSpec       string `json:"gaptorCronSpec"`
 }
 
 type SMTP struct {
