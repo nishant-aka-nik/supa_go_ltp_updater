@@ -203,6 +203,9 @@ func Gaptor() {
 	//update todays data to previous day data
 	supabase.PreviousDayDataUpdater(stocksData, config.AppConfig.TableNames.PreviousDayData)
 
+	//health check mail
+	notification.SendMails(notification.GetHealthCheckEmailList("Gaptor"))
+
 	// log execution time
 	end := utils.GetISTTime()
 	log.Printf("Job ended at: %s\n", end)
