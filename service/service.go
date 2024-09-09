@@ -127,6 +127,7 @@ func Gaptor() {
 
 	//safeguard
 	if !filter.IsSafeToGapFilter(stocksData[0].Date, previousDayDataSlice[0].Date) {
+		log.Printf("Gaptor is not safe to run at %v", start)
 		return
 	}
 	//-----------------
@@ -178,9 +179,15 @@ func Gaptor() {
 
 	var GapEntryStocks []model.Stock
 	for _, stockData := range stocksData {
-		gapPivot := symbolToGapFilteredMap[stockData.Symbol].GapPivot
+		// LEARNING: here if the map does not have that value it will not throw runtime error
+		// it will return zero value 
+		// to prevent this ok format is used
+		gappedStock, ok := symbolToGapFilteredMap[stockData.Symbol]
+		if !ok {
+			continue
+		}
 
-		entry := stockData.Close > (gapPivot + 2)
+		entry := stockData.Close > (gappedStock.GapPivot + 2)
 
 		if entry {
 			GapEntryStocks = append(GapEntryStocks, stockData)

@@ -82,3 +82,11 @@ BUG TODO:
     - I am being lenient on the accurate stoploss lets see how much i can get by this
     - this new fucntion backtester will operate on new table backtester
 - we are decoupling back test results and top picks 
+
+### Gaptor Testing
+- test it by running inbetween market by running twice
+- test it at 4 pm by running twice
+
+## Ideal Gaptor charts
+- ![alt text](gap_charts/image-1.png)
+- ![alt text](gap_charts/image.png)

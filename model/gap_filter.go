@@ -18,7 +18,7 @@ func (s GapFilter) FormatDate(dateStr string) string {
 	// Parse the input date string
 	t, err := time.Parse("2006-01-02", dateStr)
 	if err != nil {
-		log.Fatalf("Error parsing date: %v", err)
+		log.Fatalf("GapFilter model Error parsing date: %v", err)
 	}
 	// Format it in YYYY-MM-DD
 	return t.Format("2006-01-02")
