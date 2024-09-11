@@ -79,7 +79,7 @@ func InitCronScheduler() *cron.Cron {
 
 	// Target hit cron job
 	log.Printf("Adding target hit cron job with spec: %s\n", config.AppConfig.CronSpec.TargetHitCronSpec)
-	cronEntryID, cronErr = c.AddFunc(config.AppConfig.CronSpec.FilterStocksCronSpec, service.TargetHitCheckerCron)
+	cronEntryID, cronErr = c.AddFunc(config.AppConfig.CronSpec.TargetHitCronSpec, service.TargetHitCheckerCron)
 	if cronErr != nil {
 		log.Fatalf("Failed to add cron job: %v", cronErr)
 	}
@@ -87,7 +87,7 @@ func InitCronScheduler() *cron.Cron {
 
 	// Target hit cron job
 	log.Printf("Adding gaptor cron job with spec: %s\n", config.AppConfig.CronSpec.GaptorCronSpec)
-	cronEntryID, cronErr = c.AddFunc(config.AppConfig.CronSpec.FilterStocksCronSpec, service.Gaptor)
+	cronEntryID, cronErr = c.AddFunc(config.AppConfig.CronSpec.GaptorCronSpec, service.Gaptor)
 	if cronErr != nil {
 		log.Fatalf("Failed to add cron job: %v", cronErr)
 	}
