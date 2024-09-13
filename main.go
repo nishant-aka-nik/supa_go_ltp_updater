@@ -44,6 +44,11 @@ func RunServiceOnStartup() {
 		return // Skip further execution
 	}
 
+	if !utils.IsSafeTimeToRun() {
+		log.Printf("It's not safe time to run skipping execution. time: %v", utils.GetISTTime())
+		return 
+	}
+
 	service.CronLtpUpdater()
 	service.FilterStocks()
 	service.TargetHitCheckerCron()
