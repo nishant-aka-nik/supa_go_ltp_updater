@@ -20,7 +20,8 @@ type Config struct {
 
 type TableNames struct {
 	PreviousDayData string `json:"previousDayData"`
-	GapFilter       string `josn:"gapFilter"`
+	GapFilter       string `json:"gapFilter"`
+	BreakoutFilter  string `json:"breakoutFilter"`
 }
 
 type CronSpec struct {

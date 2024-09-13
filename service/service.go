@@ -54,22 +54,24 @@ func FilterStocks() {
 	log.Printf("--------------------------xxx--------------------------")
 
 	// get active stocks
-	crossMatchedStocks := supabase.GetCrossMatchedStocks("filter_history")
+	crossMatchedStocks := supabase.GetCrossMatchedStocks(config.AppConfig.TableNames.BreakoutFilter)
 
 	// Alert Stage
 	filter.Alert(latestStocksData, crossMatchedStocks)
 
 	// Insert Stage
 	// filter cross match stocks
-	filterStocks := filter.FilterCrossMatchStocks(latestStocksData)
+	filteredStocks := filter.FilterCrossMatchStocks(latestStocksData)
 	// update cross match stocks data in supabase
-	supabase.InsertCrossMatchedStocks(filterStocks, "filter_history")
+	supabase.InsertCrossMatchedStocks(filteredStocks, config.AppConfig.TableNames.BreakoutFilter)
 
 	// Reset Stage
+	// get entered stocks
+	enteredStocks := supabase.GetEnteredStocks(config.AppConfig.TableNames.BreakoutFilter)
 	// filter reset stocks
-	resetStocks := filter.Reset(latestStocksData, crossMatchedStocks)
+	resetStocks := filter.Reset(latestStocksData, enteredStocks)
 	// update reset stocks data in supabase
-	supabase.Reset(resetStocks, "filter_history")
+	supabase.Reset(resetStocks, config.AppConfig.TableNames.BreakoutFilter)
 
 	notification.SendMails(notification.GetHealthCheckEmailList("FilterStocks"))
 
@@ -180,7 +182,7 @@ func Gaptor() {
 	var GapEntryStocks []model.Stock
 	for _, stockData := range stocksData {
 		// LEARNING: here if the map does not have that value it will not throw runtime error
-		// it will return zero value 
+		// it will return zero value
 		// to prevent this ok format is used
 		gappedStock, ok := symbolToGapFilteredMap[stockData.Symbol]
 		if !ok {

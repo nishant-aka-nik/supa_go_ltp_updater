@@ -20,7 +20,7 @@ func IsSafeToGapFilter(currentDateString string, previousDateStr string) bool {
 		log.Fatalf("Error parsing previous date: %v", err)
 	}
 
-	thresholdTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 16, 0, 0, 0, currentTime.Location())
+	thresholdTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 15, 59, 0, 0, currentTime.Location())
 
 	safeDate := previousDate.Before(currentDate)
 	safeTime := currentTime.After(thresholdTime)

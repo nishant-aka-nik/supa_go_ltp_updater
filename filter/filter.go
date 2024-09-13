@@ -2,6 +2,7 @@ package filter
 
 import (
 	"log"
+	"supa_go_ltp_updater/config"
 	"supa_go_ltp_updater/model"
 	"supa_go_ltp_updater/notification"
 	"supa_go_ltp_updater/supabase"
@@ -29,8 +30,8 @@ func FilterStocks(stocksData []model.Stock) []model.Stock {
 	return filteredStocks
 }
 
-func Alert(latestStocksData []model.Stock, crossMatchedStocks []model.Stock) {
-	var crossMatchedStockMap = make(map[string]model.Stock)
+func Alert(latestStocksData []model.Stock, crossMatchedStocks []model.BreakoutFilter) {
+	var crossMatchedStockMap = make(map[string]model.BreakoutFilter)
 	for _, record := range crossMatchedStocks {
 		crossMatchedStockMap[record.Symbol] = record
 	}
@@ -43,7 +44,7 @@ func Alert(latestStocksData []model.Stock, crossMatchedStocks []model.Stock) {
 		}
 
 		entryStart := crossMatchedStockMap[stock.Symbol].GetEntry()
-		id := crossMatchedStockMap[stock.Symbol].Id
+		id := crossMatchedStockMap[stock.Symbol].ID
 		highCloseDiff := stock.GetPercentageDifferenceBetweenHighAndClose()
 		openCloseDiff := stock.GetPercentageDifferenceBetweenOpenAndClose()
 
@@ -56,13 +57,9 @@ func Alert(latestStocksData []model.Stock, crossMatchedStocks []model.Stock) {
 			filteredStockSlice = append(filteredStockSlice, stock)
 
 			//---------------
-			if !crossMatchedStockMap[stock.Symbol].Entry {
-				stoploss := stock.Close - (stock.Close * 0.1)
-				target := stock.Close + (stock.Close * 0.05)
-				entryPrice := stock.Close
-				entryDate := stock.FormatDate(stock.Date)
-				supabase.MarkStoplossTargetEntryCrossMatch(entryPrice, entryDate, stoploss, target, id, "filter_history")
-			}
+			entryPrice := stock.Close
+			entryDate := stock.FormatDate(stock.Date)
+			supabase.MarkEntry(entryPrice, entryDate, id, config.AppConfig.TableNames.BreakoutFilter)
 
 			//---------------
 			if len(filteredStockSlice) > 0 {
@@ -87,8 +84,8 @@ func Alert(latestStocksData []model.Stock, crossMatchedStocks []model.Stock) {
 	}
 }
 
-func FilterCrossMatchStocks(latestStocksData []model.Stock) []model.Stock {
-	var filteredStocks []model.Stock
+func FilterCrossMatchStocks(latestStocksData []model.Stock) []model.BreakoutFilter {
+	var filteredStocks []model.BreakoutFilter
 
 	for i := 0; i < len(latestStocksData); i++ {
 		highCloseDiff := latestStocksData[i].GetPercentageDifferenceBetweenHighAndClose()
@@ -102,9 +99,14 @@ func FilterCrossMatchStocks(latestStocksData []model.Stock) []model.Stock {
 		candleGreaterThanWick := openCloseDiff > highCloseDiff
 
 		if crossMatch && volumeTimes > 1.5 && openCloseDiff > 2 && candleGreaterThanWick {
-			latestStocksData[i].CrossMatch = true
-			latestStocksData[i].CrossMatchPivot = latestStocksData[i].High
-			filteredStocks = append(filteredStocks, latestStocksData[i])
+			crossMatchedStock := model.BreakoutFilter{
+				Symbol:          latestStocksData[i].Symbol,
+				CrossMatch:      true,
+				CrossMatchPivot: latestStocksData[i].High,
+				CrossMatchDate:  latestStocksData[i].FormatDate(latestStocksData[i].Date),
+				VolumeTimes:     latestStocksData[i].GetVolumeTimes(),
+			}
+			filteredStocks = append(filteredStocks, crossMatchedStock)
 		}
 
 	}
@@ -112,23 +114,22 @@ func FilterCrossMatchStocks(latestStocksData []model.Stock) []model.Stock {
 	return filteredStocks
 }
 
-func Reset(latestStocksData []model.Stock, crossMatchedStocks []model.Stock) []model.Stock {
+func Reset(latestStocksData []model.Stock, enteredStocks []model.BreakoutFilter) []model.BreakoutFilter {
 	// make entry and active both false on stoploss hit
 	var latestStocksDataMap = make(map[string]model.Stock)
 	for _, record := range latestStocksData {
 		latestStocksDataMap[record.Symbol] = record
 	}
 
-	var resetStocks []model.Stock
+	var resetStocks []model.BreakoutFilter
 
-	for _, stock := range crossMatchedStocks {
+	for _, stock := range enteredStocks {
 		LTP := latestStocksDataMap[stock.Symbol].Close
 
-		price5PercentAbovePivot := LTP > (stock.CrossMatchPivot * 1.05)
+		price4PercentAboveEntry := LTP > (stock.EntryPrice * 1.04)
 
-		if price5PercentAbovePivot {
+		if price4PercentAboveEntry {
 			stock.Entry = false
-			stock.CrossMatch = false
 			resetStocks = append(resetStocks, stock)
 		}
 	}
