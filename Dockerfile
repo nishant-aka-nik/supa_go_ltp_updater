@@ -17,7 +17,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o main .
+RUN go build -o argus .
 
 # Start a new stage from scratch
 FROM alpine:latest
@@ -28,7 +28,7 @@ RUN apk update && apk add --no-cache tzdata
 WORKDIR /root/
 
 # Copy the Pre-built binary file from the previous stage
-COPY --from=builder /app/main .
+COPY --from=builder /app/argus .
 
 # Copy the config file
 COPY config/config.json /root/config/config.json
@@ -37,4 +37,4 @@ COPY config/config.json /root/config/config.json
 EXPOSE 8080
 
 # Command to run the executable
-CMD ["./main"]
+CMD ["./argus"]
