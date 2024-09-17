@@ -1,8 +1,11 @@
 package service
 
 import (
+	"context"
 	"log"
 	"supa_go_ltp_updater/config"
+	"supa_go_ltp_updater/constants"
+	contextkeys "supa_go_ltp_updater/context"
 	"supa_go_ltp_updater/filter"
 	"supa_go_ltp_updater/model"
 	"supa_go_ltp_updater/notification"
@@ -42,7 +45,7 @@ func CronLtpUpdater() {
 	log.Println("Finished running CronLtpUpdater")
 }
 
-func FilterStocks() {
+func FilterStocks(ctx context.Context) {
 	start := utils.GetISTTime()
 	log.Printf("FilterStocks Job started at: %s\n", start)
 	log.Println("Running FilterStocks")
@@ -73,7 +76,10 @@ func FilterStocks() {
 	// update reset stocks data in supabase
 	supabase.Reset(resetStocks, config.AppConfig.TableNames.BreakoutFilter)
 
-	notification.SendMails(notification.GetHealthCheckEmailList("FilterStocks"))
+	caller := contextkeys.GetCaller(ctx)
+	if caller == constants.CronCaller {
+		notification.SendMails(notification.GetHealthCheckEmailList("FilterStocks"))
+	}
 
 	// log execution time
 	end := utils.GetISTTime()
@@ -82,7 +88,7 @@ func FilterStocks() {
 	log.Println("Finished running FilterStocks")
 }
 
-func TargetHitCheckerCron() {
+func TargetHitCheckerCron(ctx context.Context) {
 	start := utils.GetISTTime()
 	log.Printf("Job started at: %s\n", start)
 	log.Println("Running CronLtpUpdater")
@@ -102,7 +108,10 @@ func TargetHitCheckerCron() {
 	//check for target hit and send notification
 	watch.TargetHit(stocksData, symbolToLtpMap, swingLogs)
 
-	notification.SendMails(notification.GetHealthCheckEmailList("TargetHitCheckerCron"))
+	caller := contextkeys.GetCaller(ctx)
+	if caller == constants.CronCaller {
+		notification.SendMails(notification.GetHealthCheckEmailList("TargetHitCheckerCron"))
+	}
 
 	// log execution time
 	end := utils.GetISTTime()
