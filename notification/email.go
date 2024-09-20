@@ -70,7 +70,7 @@ func GetEntryEmailList(filteredStockSlice []model.Stock, subject string) EmailLi
 	// Format the date as "30 July 2024"
 	formattedDate := now.Format("02 January 2006")
 
-	emails := []string{"nishantkumar9995@gmail.com", "nishantdotk@gmail.com", "gunnumahato@gmail.com", "shndamit25@gmail.com"}
+	emails := []string{"nishantkumar9995@gmail.com", "nishantdotk@gmail.com", "gunnumahato@gmail.com"}
 	emailList := EmailList{}
 
 	// Build the HTML body with a list of stocks
