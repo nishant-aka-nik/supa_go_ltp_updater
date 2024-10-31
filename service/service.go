@@ -76,11 +76,6 @@ func FilterStocks(ctx context.Context) {
 	// update reset stocks data in supabase
 	supabase.Reset(resetStocks, config.AppConfig.TableNames.BreakoutFilter)
 
-	caller := contextkeys.GetCaller(ctx)
-	if caller == constants.CronCaller {
-		notification.SendMails(notification.GetHealthCheckEmailList("FilterStocks"))
-	}
-
 	// log execution time
 	end := utils.GetISTTime()
 	log.Printf("Job ended at: %s\n", end)
@@ -107,11 +102,6 @@ func TargetHitCheckerCron(ctx context.Context) {
 
 	//check for target hit and send notification
 	watch.TargetHit(stocksData, symbolToLtpMap, swingLogs)
-
-	caller := contextkeys.GetCaller(ctx)
-	if caller == constants.CronCaller {
-		notification.SendMails(notification.GetHealthCheckEmailList("TargetHitCheckerCron"))
-	}
 
 	// log execution time
 	end := utils.GetISTTime()
@@ -213,9 +203,6 @@ func Gaptor() {
 
 	//update todays data to previous day data
 	supabase.PreviousDayDataUpdater(stocksData, config.AppConfig.TableNames.PreviousDayData)
-
-	//health check mail
-	notification.SendMails(notification.GetHealthCheckEmailList("Gaptor"))
 
 	// log execution time
 	end := utils.GetISTTime()
