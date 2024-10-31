@@ -4,8 +4,6 @@ import (
 	"context"
 	"log"
 	"supa_go_ltp_updater/config"
-	"supa_go_ltp_updater/constants"
-	contextkeys "supa_go_ltp_updater/context"
 	"supa_go_ltp_updater/filter"
 	"supa_go_ltp_updater/model"
 	"supa_go_ltp_updater/notification"
@@ -26,14 +24,15 @@ func CronLtpUpdater() {
 	log.Printf("Fetched stocks data: %v", stocksData)
 	log.Printf("--------------------------xxx--------------------------")
 
-	// get symbol to ltp map from stocks data
-	symbolToLtpMap := watch.GetSymbolToLtpMap(stocksData)
+	//TODO: remove the line 30 to 37 we need to re-think about the stoploss strategy
+	// // get symbol to ltp map from stocks data
+	// symbolToLtpMap := watch.GetSymbolToLtpMap(stocksData)
 
-	// get swing logs from supabase
-	swingLogs := supabase.GetLogsFromSupbase()
+	// // get swing logs from supabase
+	// swingLogs := supabase.GetLogsFromSupbase()
 
-	//check for stoploss hit and send notification
-	watch.StoplossHit(stocksData, symbolToLtpMap, swingLogs)
+	// //check for stoploss hit and send notification
+	// watch.StoplossHit(stocksData, symbolToLtpMap, swingLogs)
 
 	// update todays data in supabase
 	supabase.LtpUpdater(stocksData, "todays_data")

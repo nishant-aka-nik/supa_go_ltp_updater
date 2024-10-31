@@ -58,7 +58,8 @@ func RunServiceOnStartup(ctx context.Context) {
 
 	service.CronLtpUpdater()
 	service.FilterStocks(ctx)
-	service.TargetHitCheckerCron(ctx)
+	//TODO: need to re-think about target and stoploss strategy as the mails are very annoying and causes anxiety only continuing with filter alerts
+	// service.TargetHitCheckerCron(ctx)
 	service.Gaptor()
 }
 
