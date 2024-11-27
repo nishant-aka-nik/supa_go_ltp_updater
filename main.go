@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"supa_go_ltp_updater/config"
+	"supa_go_ltp_updater/constants"
+	contextkeys "supa_go_ltp_updater/context"
 	"supa_go_ltp_updater/service"
 	"supa_go_ltp_updater/utils"
 	"time"
@@ -12,6 +15,8 @@ import (
 )
 
 func main() {
+	ctx := context.Background()
+
 	//init microservice
 	initService()
 	//-----------------
@@ -19,9 +24,9 @@ func main() {
 	fmt.Printf("app config :%#v", config.AppConfig)
 
 	// Initialize the cron scheduler
-	c := InitCronScheduler()
+	c := InitCronScheduler(ctx)
 
-	RunServiceOnStartup()
+	RunServiceOnStartup(ctx)
 
 	// Defer the stop of the cron scheduler to ensure it stops when main function exits
 	defer c.Stop()
@@ -36,14 +41,30 @@ func initService() {
 	}
 }
 
-func RunServiceOnStartup() {
+func RunServiceOnStartup(ctx context.Context) {
+	start := utils.GetISTTime()
+	// Check if today is Saturday (6) or Sunday (0)
+	if start.Weekday() == time.Saturday || start.Weekday() == time.Sunday {
+		log.Println("It's the weekend! Skipping execution.")
+		return // Skip further execution
+	}
+
+	if !utils.IsSafeTimeToRun() {
+		log.Printf("It's not safe time to run skipping execution. time: %v", utils.GetISTTime())
+		return
+	}
+
+	ctx = contextkeys.SetCaller(ctx, constants.RunServiceOnStartupCaller)
+
 	service.CronLtpUpdater()
-	service.FilterStocks()
-	service.TargetHitCheckerCron()
+	service.FilterStocks(ctx)
+	//TODO: need to re-think about target and stoploss strategy as the mails are very annoying and causes anxiety only continuing with filter alerts
+	// service.TargetHitCheckerCron(ctx)
+	service.Gaptor()
 }
 
 // InitCronScheduler initializes and starts the cron scheduler
-func InitCronScheduler() *cron.Cron {
+func InitCronScheduler(ctx context.Context) *cron.Cron {
 	currentTime := utils.GetISTTime()
 	log.Printf("Initializing cron job at %v\n", currentTime)
 
@@ -63,7 +84,7 @@ func InitCronScheduler() *cron.Cron {
 
 	// Filter stocks cron job
 	log.Printf("Adding filter stocks cron job with spec: %s\n", config.AppConfig.CronSpec.FilterStocksCronSpec)
-	cronEntryID, cronErr = c.AddFunc(config.AppConfig.CronSpec.FilterStocksCronSpec, service.FilterStocks)
+	cronEntryID, cronErr = addCronJobWithContext(c, config.AppConfig.CronSpec.FilterStocksCronSpec, "FilterStocks", service.FilterStocks)
 	if cronErr != nil {
 		log.Fatalf("Failed to add cron job: %v", cronErr)
 	}
@@ -71,7 +92,15 @@ func InitCronScheduler() *cron.Cron {
 
 	// Target hit cron job
 	log.Printf("Adding target hit cron job with spec: %s\n", config.AppConfig.CronSpec.TargetHitCronSpec)
-	cronEntryID, cronErr = c.AddFunc(config.AppConfig.CronSpec.FilterStocksCronSpec, service.TargetHitCheckerCron)
+	cronEntryID, cronErr = addCronJobWithContext(c, config.AppConfig.CronSpec.TargetHitCronSpec, "TargetHitCheckerCron", service.TargetHitCheckerCron)
+	if cronErr != nil {
+		log.Fatalf("Failed to add cron job: %v", cronErr)
+	}
+	log.Printf("Cron job added with ID: %d\n", cronEntryID)
+
+	// Target hit cron job
+	log.Printf("Adding gaptor cron job with spec: %s\n", config.AppConfig.CronSpec.GaptorCronSpec)
+	cronEntryID, cronErr = c.AddFunc(config.AppConfig.CronSpec.GaptorCronSpec, service.Gaptor)
 	if cronErr != nil {
 		log.Fatalf("Failed to add cron job: %v", cronErr)
 	}
@@ -82,4 +111,15 @@ func InitCronScheduler() *cron.Cron {
 	c.Start()
 	log.Println("Cron scheduler initialized")
 	return c
+}
+
+func addCronJobWithContext(c *cron.Cron, spec string, jobName string, jobFunc func(ctx context.Context)) (cron.EntryID, error) {
+	return c.AddFunc(spec, func() {
+		ctx := context.Background()
+		ctx = contextkeys.SetCaller(ctx, constants.CronCaller)
+
+		log.Printf("Starting cron job: %s", jobName)
+		jobFunc(ctx)
+		log.Printf("Completed cron job: %s", jobName)
+	})
 }

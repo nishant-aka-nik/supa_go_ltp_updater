@@ -46,7 +46,7 @@ func (s Stock) GetPercentageDifferenceBetweenOpenAndClose() float64 {
 }
 
 func (s Stock) GetEntry() float64 {
-	return s.CrossMatchPivot + (s.CrossMatchPivot * 0.02)
+	return s.CrossMatchPivot + (s.CrossMatchPivot * 0.01)
 }
 
 func (s Stock) StoplossHit() bool {
@@ -61,7 +61,7 @@ func (s Stock) FormatDate(dateStr string) string {
 	// Parse the input date string
 	t, err := time.Parse("02/01/2006", dateStr)
 	if err != nil {
-		log.Fatalf("Error parsing date: %v", err)
+		log.Fatalf("Stock model Error parsing date: %v", err)
 	}
 	// Format it in YYYY-MM-DD
 	return t.Format("2006-01-02")

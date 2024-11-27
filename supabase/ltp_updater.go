@@ -1,16 +1,19 @@
 package supabase
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"supa_go_ltp_updater/config"
 	"supa_go_ltp_updater/model"
+	"sync"
 
 	"github.com/nedpals/supabase-go"
 )
 
 func LtpUpdater(stocksData []model.Stock, tableName string) {
 	client := GetSupabaseClient()
+	var wg sync.WaitGroup
 
 	var recordsInTable []model.Stock
 	//get all table records
@@ -40,25 +43,19 @@ func LtpUpdater(stocksData []model.Stock, tableName string) {
 		}
 
 		if _, ok := symbolsMap[record.Symbol]; !ok {
-			log.Printf("Inserting record: %v\n", record)
-			var result []map[string]interface{}
-			err := client.DB.From(tableName).Insert(payload).Execute(&result)
-			if err != nil {
-				log.Fatalf("Error updating table: %v", err)
-			}
+			wg.Add(1)
+			go InsertSupabase(&wg, client, payload, tableName)
 			continue
 		}
 
-		// FIXME: this needs to be optimised it is very slow 24s a lot
-		log.Printf("Updating record: %v\n", record)
-		var result []map[string]interface{}
-		err := client.DB.From(tableName).Update(payload).Eq("symbol", record.Symbol).Execute(&result)
-		if err != nil {
-			log.Fatalf("Error updating table: %v for records: %#v", err, record)
-		}
-
+		wg.Add(1)
+		go UpdateSupabase(&wg, client, payload, tableName, record.Symbol)
 		// TODO: add deletion also supabase should mirror the google sheet
 	}
+
+	fmt.Println("waiting...")
+	wg.Wait()
+	fmt.Println("done wating")
 }
 
 func GetSupabaseClient() *supabase.Client {

@@ -62,5 +62,31 @@ DB Design
 - https://dbdiagram.io/d/Argus-6664a4a89713410b051854cf
 
 
-so when the close > 2% of cross match pivot we will set the entry true and make the crossmatch to false
-how we will mark the entry to be false 
+BUG TODO:
+- reset entry based on date also 
+- health check report needs to be generated and then sent properly only once per day
+- also test the reset of the stock
+    - this fucntion will operate on filter_history table
+    - check that what will happen if the stocks becomes active again will the new entry be create or same entry gets updated
+- new target implementation
+- add cross matched stocks list with progress bar to see how far it is from entry price
+    - 2 sections will be there namely - potential entry stocks and Ready to entry stocks
+- add a new table 'backtester' which will add stocks and use my 5target-10stoploss-15stoploss strategy to mark entry and exit 
+    - entry bool
+    - entry_date date
+    - exit when stoploss hit 
+    - exit bool
+    - exit_date date
+    - what will happen if exited stock becomes active again
+    - i will add a new fucntion named backtester which will run in the end of the stock market session daily
+    - I am being lenient on the accurate stoploss lets see how much i can get by this
+    - this new fucntion backtester will operate on new table backtester
+- we are decoupling back test results and top picks 
+
+### Gaptor Testing
+- test it by running inbetween market by running twice
+- test it at 4 pm by running twice
+
+## Ideal Gaptor charts
+- ![alt text](gap_charts/image-1.png)
+- ![alt text](gap_charts/image.png)

@@ -9,18 +9,26 @@ import (
 )
 
 type Config struct {
-	GsheetUrl          string   `json:"gsheetUrl"`
-	Supabase           Supabase `json:"supabase"`
-	CronSpec           CronSpec `json:"cronSpec"`
-	Email              SMTP     `json:"email"`
-	TargetPercentage   float64  `json:"targetPercentage"`
-	StoplossPercentage float64  `json:"stoplossPercentage"`
+	GsheetUrl          string     `json:"gsheetUrl"`
+	Supabase           Supabase   `json:"supabase"`
+	CronSpec           CronSpec   `json:"cronSpec"`
+	Email              SMTP       `json:"email"`
+	TargetPercentage   float64    `json:"targetPercentage"`
+	StoplossPercentage float64    `json:"stoplossPercentage"`
+	TableNames         TableNames `json:"tableNames"`
+}
+
+type TableNames struct {
+	PreviousDayData string `json:"previousDayData"`
+	GapFilter       string `json:"gapFilter"`
+	BreakoutFilter  string `json:"breakoutFilter"`
 }
 
 type CronSpec struct {
 	LtpUpdaterCronSpec   string `json:"ltpUpdateCronSpec"`
 	FilterStocksCronSpec string `json:"filterStocksCronSpec"`
 	TargetHitCronSpec    string `json:"targetHitCronSpec"`
+	GaptorCronSpec       string `json:"gaptorCronSpec"`
 }
 
 type SMTP struct {

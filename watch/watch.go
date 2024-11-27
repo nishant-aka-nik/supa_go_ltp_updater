@@ -55,6 +55,9 @@ func TargetHit(stocksData []model.Stock, symbolToLtpMap map[string]float64, swin
 
 		// check if target hit
 		if ltp > swingLog.Target {
+			if swingLog.Stoploss >= swingLog.BuyPrice && swingLog.LongPosition {
+				continue
+			}
 			newStoploss := ltp - (ltp * (config.AppConfig.StoplossPercentage / 100))
 			swingLog.Stoploss = newStoploss
 			newTarget := ltp + (ltp * (config.AppConfig.TargetPercentage / 100))
