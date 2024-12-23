@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"reflect"
@@ -60,7 +61,7 @@ func csvToJSON(csvData []byte) ([]model.Stock, error) {
 		// Convert the map to a Stock struct
 		stock, err := mapToStock(row)
 		if err != nil {
-			return nil, err
+			log.Printf("error occurred when mapping %v. data %#v. err: %#v", stock.Symbol, stock, err)
 		}
 		stocks = append(stocks, stock)
 	}

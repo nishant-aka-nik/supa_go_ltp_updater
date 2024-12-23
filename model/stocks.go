@@ -26,6 +26,11 @@ type Stock struct {
 }
 
 func (s Stock) GetVolumeTimes() float64 {
+	// this can happen sometime when the symbol change in google finance it will not have a DailyAvgVolume
+	// to prevent divide by zero issue 
+	if s.DailyAvgVolume == 0 {
+		return 0
+	}
 	volumeTimes := s.Volume / s.DailyAvgVolume
 	return utils.FormatToTwoDecimalPlaces(volumeTimes)
 }
